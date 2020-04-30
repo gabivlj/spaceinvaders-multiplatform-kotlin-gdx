@@ -6,12 +6,13 @@ import kotlin.math.abs
 
 
 enum class ToListen {
-    LEFT_BUTTON,
-    RIGHT_BUTTON,
-    TOP_BUTTON,
-    BOTTOM_BUTTON,
-    RIGHT_PAD,
-    LEFT_PAD,
+    LEFT_FACE,
+    RIGHT_FACE,
+    TOP_FACE,
+    BOTTOM_FACE,
+
+    RIGHT_BUMPER,
+    LEFT_BUMPER,
 
     // For gamepads that have arrows (like the PS4)
     LEFT_BUTTON_1,
@@ -20,9 +21,12 @@ enum class ToListen {
     DOWN_BUTTON_1,
 
     NONE,
+    
+    // Axis
     RIGHT_STICK,
     LEFT_STICK,
-    // Main controls
+    LEFT_TRIGGER,
+    RIGHT_TRIGGER,
 
 
     // For arcade type gamepads (tries from left to right and from top to bottom) (IF THERE ARE MORE BUTTONS LIKE A SECOND PLAYER THE SECOND PLAYER WILL BE
@@ -126,10 +130,10 @@ enum class XinmotekAxisMappings(val value: Int, val representation: ToListen) {
 }
 
 enum class PS4ButtonMappings(val value: Int, val representation: ToListen) {
-    SQUARE_BUTTON(0, ToListen.LEFT_BUTTON),
-    TRIANGLE_BUTTON(2, ToListen.TOP_BUTTON),
-    CIRCLE_BUTTON(3, ToListen.RIGHT_BUTTON),
-    CROSS_BUTTON(1, ToListen.BOTTOM_BUTTON),
+    SQUARE_BUTTON(0, ToListen.LEFT_FACE),
+    TRIANGLE_BUTTON(2, ToListen.TOP_FACE),
+    CIRCLE_BUTTON(3, ToListen.RIGHT_FACE),
+    CROSS_BUTTON(1, ToListen.BOTTOM_FACE),
     NONE(-1, ToListen.NONE);
 
     companion object {
@@ -216,10 +220,10 @@ class PhysicalJoystick(
         }
 
         val xinmotekMap=  if (
-                whatToListen == ToListen.LEFT_BUTTON ||
-                whatToListen == ToListen.RIGHT_BUTTON ||
-                whatToListen == ToListen.TOP_BUTTON ||
-                whatToListen == ToListen.BOTTOM_BUTTON
+                whatToListen == ToListen.LEFT_FACE ||
+                whatToListen == ToListen.RIGHT_FACE ||
+                whatToListen == ToListen.TOP_FACE ||
+                whatToListen == ToListen.BOTTOM_FACE
                 )
                        XinmotekButtonMappings.toNormalGamepad(buttonCode, controllerString)
                  else  XinmotekButtonMappings.from(buttonCode, controllerString)

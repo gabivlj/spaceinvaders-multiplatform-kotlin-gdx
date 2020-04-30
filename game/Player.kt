@@ -1,6 +1,5 @@
 package architecture.game
 
-import architecture.engine.Game
 import architecture.engine.World
 import architecture.engine.structs.GameObjectInput
 import architecture.engine.structs.IJoystick
@@ -140,7 +139,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
         if (accumulatorSpecialAttack < 100 ) {
             return
         }
-        if (whatToListen != ToListen.LEFT_BUTTON) {
+        if (whatToListen != ToListen.LEFT_FACE) {
             return
         }
         accumulatorSpecialAttack = 0.0f

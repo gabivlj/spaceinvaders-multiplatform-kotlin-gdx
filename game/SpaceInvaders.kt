@@ -247,7 +247,7 @@ class SpaceInvaders : Game() {
             joystick01 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_STICK, arrayOf(Input.Keys.D, Input.Keys.A, Input.Keys.W, Input.Keys.S), 2.5f))
             joystick02 = World.world.instantiate(PhysicalJoystick(ToListen.RIGHT_STICK, arrayOf(Input.Keys.RIGHT, Input.Keys.LEFT, Input.Keys.UP, Input.Keys.DOWN), 2.5f))
             // fuck (TODO: MAP BUTTONS)
-            joystick03 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_BUTTON, arrayOf(Input.Keys.E, -1, Input.Keys.E, -1), 2.5f))
+            joystick03 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_FACE, arrayOf(Input.Keys.E, -1, Input.Keys.E, -1), 2.5f))
         }
 
         World.world.instantiate(Player(sprites.slice(0..2).toTypedArray(), joystick01, joystick02, joystick03))
