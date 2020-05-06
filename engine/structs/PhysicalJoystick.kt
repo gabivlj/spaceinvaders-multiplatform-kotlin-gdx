@@ -21,7 +21,7 @@ enum class ToListen {
     DOWN_BUTTON_1,
 
     NONE,
-    
+
     // Axis
     RIGHT_STICK,
     LEFT_STICK,

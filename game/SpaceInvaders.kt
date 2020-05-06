@@ -144,7 +144,7 @@ class SpaceInvaders : Game() {
         World.world.instantiate(SpecialAttackBar())
 
         Background(spritesBackground[0])
-        UIManager()
+        UIManagerInGame()
         LevelManager()
     }
 

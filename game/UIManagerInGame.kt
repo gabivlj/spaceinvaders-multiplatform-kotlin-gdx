@@ -2,6 +2,7 @@ package architecture.game
 
 import architecture.engine.World
 import architecture.engine.structs.Text
+import architecture.engine.structs.UIButton
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -9,13 +10,28 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
 
-class UIManager : GameObject(arrayOf(), 0.0f, 0.0f) {
+class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
     val shape: ShapeRenderer = ShapeRenderer()
     var player: Player? = null
     var text: Text = Text()
 
+    /*
+    val button: UIButton = UIButton(
+            SpaceInvaders.sprites.slice(0..3).toTypedArray(),
+            300f,
+            100f,
+            Vector2(Gdx.graphics.width / 2f, Gdx.graphics.height / 2f),
+            "Test button",
+            Vector2()) {
+                it.text = "Clicked"
+                Gdx.app.log("TEXT_CHANGE", "Click")
+            }
+    */
+
     init {
         World.world.instantiate(this)
+
+        // World.world.instantiate(button)
     }
 
     override fun start() {
@@ -23,7 +39,10 @@ class UIManager : GameObject(arrayOf(), 0.0f, 0.0f) {
         text.position = Vector2()
 
         player = World.world.findGameObjects<Player>()[0]
-        if (player == null) World.world.destroy(this)
+        if (player == null) {
+            World.world.destroy(this)
+            text.stop()
+        }
 
     }
 
