@@ -17,7 +17,9 @@ class SpecialAttackBar : GameObject(arrayOf(), 0.0f, 0.0f) {
         if (player == null) {
             World.world.destroy(this)
         }
-        joy = World.world.findGameObjects<Joy>().filter { joy -> joy.tag == "JOYSTICK ATTACK" }[0]
+        val joys = World.world.findGameObjects<Joy>().filter { joy -> joy.tag == "JOYSTICK ATTACK" }
+        if (joys.isNotEmpty()) joy = joys[0]
+
     }
 
     override fun update(dt: Float) {
@@ -36,6 +38,14 @@ class SpecialAttackBar : GameObject(arrayOf(), 0.0f, 0.0f) {
             return
         }
         joy?.activate(true)
+    }
+
+    override fun onDestroy() {
+
+    }
+
+    override fun onDispose() {
+        shape.dispose()
     }
 
 }

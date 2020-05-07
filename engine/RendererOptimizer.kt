@@ -50,10 +50,14 @@ class TextureOptimizer() {
         Gdx.gl20.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer)
         size = intBuffer.get()
         log.error("$size")
-        pixmap = Pixmap(10000, 10000, Pixmap.Format.RGBA8888)
+        pixmap = Pixmap(2000, 2000, Pixmap.Format.RGBA8888)
     }
     companion object {
         val log = Logger("renderer")
+    }
+
+    fun dispose() {
+        pixmap.dispose()
     }
 
     /**
@@ -167,16 +171,26 @@ class RendererOptimizer {
         return consume()
     }
 
+    var regions: MutableList<TextureRegion> = mutableListOf()
+
     /**
      * Gets whatever is stored in bigTexture depending on tInfos
      */
     private fun consume(): MutableList<Sprite> {
         val arr: MutableList<Sprite> = mutableListOf()
         for (textureInfo in pixmap.tInfos) {
-            arr.add(Sprite(TextureRegion(bigTexture, textureInfo.x, textureInfo.y, textureInfo.w, textureInfo.h)))
+            regions.add(TextureRegion(bigTexture, textureInfo.x, textureInfo.y, textureInfo.w, textureInfo.h))
+            arr.add(Sprite(regions.last()))
         }
-        spriteStore.addAll(arr)
+        //spriteStore.addAll(arr)
         return arr
+    }
+
+    fun dispose() {
+        pixmap.dispose()
+        bigTexture.dispose()
+        regions.last().texture.dispose()
+        regions = mutableListOf()
     }
 
     /**

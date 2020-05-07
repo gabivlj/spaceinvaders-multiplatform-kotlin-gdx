@@ -20,6 +20,7 @@ class Text {
      * Stops rendering this text
      */
     fun stop() {
+        bitmapFont.dispose()
         Game.renderer.textUI.remove(this)
     }
 
@@ -29,4 +30,5 @@ class Text {
     fun render() {
         Game.renderer.textUI.add(this)
     }
+
 }

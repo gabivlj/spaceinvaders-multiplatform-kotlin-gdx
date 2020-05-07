@@ -24,6 +24,7 @@ class Renderer {
         private var spritesStore: HashMap<String, Sprite> = HashMap()
         private var textures: MutableList<TextureRegion> = mutableListOf(TextureRegion())
 
+        public var fallback: () -> Sprite? = { null }
         /**
          * Render size. The camera will be affected by this.
          */
@@ -127,45 +128,47 @@ class Renderer {
     }
 
     fun renderOptimized(world: World) {
-        Animator.animations.forEach { animation -> animation.update() }
-
-        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-        Gdx.gl.glDisable(GL20.GL_BLEND)
-
 
         batch.projectionMatrix = camera.combined
+        Animator.animations.forEach { animation -> animation.update() }
         batch.begin()
+
+
         for (gameObject in world.gameObjects) {
             if (!gameObject.active) continue
             gameObject.sprite().setOrigin(gameObject.width / 2, gameObject.height / 2)
             gameObject.sprite().rotation = gameObject.rotation
             gameObject.sprite().setBounds(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height)
             gameObject.sprite().setPosition(gameObject.position.x, gameObject.position.y)
-            gameObject.sprite().setPosition(
-                    gameObject.position.x,
-                    gameObject.position.y
-            )
             gameObject.sprite().setScale(if (gameObject.flipX) -1.0f else 1.0f, 1.0f)
             gameObject.sprite().draw(batch)
         }
 
+
+
         for (text in textUI) {
             text.font.draw(batch, text.text, text.position.x, text.position.y)
         }
+
         batch.end()
+        Gdx.app.log("RENDER CALLS", "${batch.renderCalls}")
+        Gdx.app.log("FPS", "${Gdx.graphics.framesPerSecond}")
+
     }
 
     fun start() {
-        batch = SpriteBatch()
+        batch = SpriteBatch(8191)
         camera = OrthographicCamera()
 
         camera.position.set(0f, 0f, 0f)
         camera.viewportHeight = sizeRenderer.y
         camera.viewportWidth = sizeRenderer.x
         camera.update()
+        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        //Gdx.gl.glDisable(GL20.GL_BLEND)
     }
 
 }

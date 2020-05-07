@@ -17,15 +17,15 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     enum class CurrentShot(
             val nBullets: Int,
             val damage: Float,
-            val spritesBullet: Array<Sprite>,
+            val spritesBullet: IntRange,
             val margin: Float,
             val speed: Float = 1000f,
             val size: Vector2 = Vector2(50f, 100f),
             val ammo: Float = 1000f
     ) {
-        NORMAL(1, 10f, SpaceInvaders.sprites.slice(3..8).toTypedArray(), 0f),
-        ENERGY(3, 8f, SpaceInvaders.sprites.slice(30..30).toTypedArray(), 53f, 1000f, Vector2(20f, 100f)),
-        MISSILE(1, 28f, SpaceInvaders.sprites.slice(31..31).toTypedArray(), 0f, 1500f, Vector2(30f, 110f), 500f)
+        NORMAL(1, 10f, 3..8, 0f),
+        ENERGY(3, 8f, 30..30, 53f, 1000f, Vector2(20f, 100f)),
+        MISSILE(1, 28f, 31..31, 0f, 1500f, Vector2(30f, 110f), 500f)
     }
 
     var currentShot: CurrentShot = CurrentShot.NORMAL
@@ -54,8 +54,9 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     }
 
     override fun update(dt: Float) {
+
         if (hp <= 0f) {
-            SpaceInvaders.spaceInvaders.restart()
+            SpaceInvaders.worlds[1].start()
             return
         }
 
@@ -106,7 +107,14 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             return
         }
         for (i in 1..currentShot.nBullets) {
-            val bullet = NormalBullet(Vector2(), dir, { accumulatorSpecialAttack += 10f }, currentShot.spritesBullet, currentShot.damage, currentShot.speed)
+            val bullet = NormalBullet(
+                    Vector2(),
+                    dir,
+                    { accumulatorSpecialAttack += 10f },
+                    SpaceInvaders.sprites.slice(currentShot.spritesBullet).toTypedArray(),
+                    currentShot.damage,
+                    currentShot.speed
+            )
             bullet.width = currentShot.size.x
             bullet.height = currentShot.size.y
             val bull = World.world.instantiate(bullet)

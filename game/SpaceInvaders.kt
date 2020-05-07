@@ -29,9 +29,12 @@ class SpaceInvaders : Game() {
         lateinit var spaceInvaders: SpaceInvaders
     }
 
+    lateinit var rendererOpt: RendererOptimizer
+    lateinit var rendererBackground: RendererOptimizer
+
     private fun startForGameplayWorld() {
-        val rendererOpt = RendererOptimizer()
-        val rendererBackground = RendererOptimizer()
+        rendererOpt = RendererOptimizer()
+        rendererBackground = RendererOptimizer()
         sprites = rendererOpt.consumeSprites("ASSETS_08")
         val baseURL = "assets/sprites/256px"
         if (sprites.isEmpty()) {
@@ -90,6 +93,7 @@ class SpaceInvaders : Game() {
             rendererOpt.saveConsumedSprites("ASSETS_08")
         }
 
+
         spritesBackground = rendererBackground.consumeSprites("ASSET_BACKGROUND3")
         if (spritesBackground.isEmpty()) {
             rendererBackground.sprite("assets/background/NebulaAqua-Pink.png")
@@ -108,26 +112,20 @@ class SpaceInvaders : Game() {
         // Set the onStart of this world
         worlds[1].onStart =  { startForGameplayWorld() }
         worlds[1].onFinish = {
-            for (sprite in sprites) {
-                sprite.texture.dispose()
-            }
+            sprites.forEach { it.texture.dispose() }
             sprites = mutableListOf()
-            for (sprite in spritesBackground) {
-                sprite.texture.dispose()
-            }
             spritesBackground = mutableListOf()
+            rendererOpt.dispose()
+            rendererBackground.dispose()
         }
 
         worlds[0].onStart =  { startForGameplayWorld() }
         worlds[0].onFinish = {
-            for (sprite in sprites) {
-                sprite.texture.dispose()
-            }
+            sprites.forEach { it.texture.dispose() }
             sprites = mutableListOf()
-            for (sprite in spritesBackground) {
-                sprite.texture.dispose()
-            }
             spritesBackground = mutableListOf()
+            rendererOpt.dispose()
+            rendererBackground.dispose()
         }
 
 
@@ -148,9 +146,10 @@ class SpaceInvaders : Game() {
         LevelManager()
     }
 
-    fun instantiatePlayerAndJoysticks() {
+    private fun instantiatePlayerAndJoysticks() {
         val sprite0 = sprites[21]
         val sprite1 = sprites[22]
+        Renderer.fallback = { sprite1 }
         val diff = (Gdx.graphics.width / 3) / 2
 
         /**
@@ -240,10 +239,11 @@ class SpaceInvaders : Game() {
         lateinit var joystick01: IJoystick
         lateinit var joystick02: IJoystick
         lateinit var joystick03: IJoystick
-        joystick01 = World.world.instantiate(joy)
-        joystick02 = World.world.instantiate(joy2)
-        joystick03 = World.world.instantiate(joy3AttackSpecial)
-        if (!isMobile) {
+        if (isMobile) {
+            joystick01 = World.world.instantiate(joy)
+            joystick02 = World.world.instantiate(joy2)
+            joystick03 = World.world.instantiate(joy3AttackSpecial)
+        } else if (!isMobile) {
             joystick01 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_STICK, arrayOf(Input.Keys.D, Input.Keys.A, Input.Keys.W, Input.Keys.S), 2.5f))
             joystick02 = World.world.instantiate(PhysicalJoystick(ToListen.RIGHT_STICK, arrayOf(Input.Keys.RIGHT, Input.Keys.LEFT, Input.Keys.UP, Input.Keys.DOWN), 2.5f))
             // fuck (TODO: MAP BUTTONS)

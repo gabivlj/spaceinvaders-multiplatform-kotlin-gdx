@@ -15,7 +15,7 @@ class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
     var player: Player? = null
     var text: Text = Text()
 
-    /*
+
     val button: UIButton = UIButton(
             SpaceInvaders.sprites.slice(0..3).toTypedArray(),
             300f,
@@ -26,12 +26,12 @@ class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
                 it.text = "Clicked"
                 Gdx.app.log("TEXT_CHANGE", "Click")
             }
-    */
+
 
     init {
         World.world.instantiate(this)
 
-        // World.world.instantiate(button)
+        World.world.instantiate(button)
     }
 
     override fun start() {
@@ -65,6 +65,11 @@ class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
 
         text.text = "${player!!.score}"
         text.position = player!!.position
+    }
+
+    override fun onDispose() {
+        shape.dispose()
+        text.stop()
     }
 
 }

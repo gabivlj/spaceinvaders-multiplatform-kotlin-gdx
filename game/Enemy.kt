@@ -34,7 +34,7 @@ class Enemy(vecPos: Vector2, hp: Float = 100.0f, val points: Array<Point> = arra
     var duration = 0.0f
     val timeBetweenShooting = 2.0f
     var accumulatorTimeBetweenShooting = 0.0f
-    val sprites = SpaceInvaders.sprites.slice(24..24).toTypedArray()
+
 
     override fun update(dt: Float) {
         if (hp <= 0) {

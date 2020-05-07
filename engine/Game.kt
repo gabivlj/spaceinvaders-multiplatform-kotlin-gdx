@@ -5,6 +5,7 @@ import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.PerformanceCounter
 
 
 open class Game : ApplicationListener {
@@ -16,8 +17,7 @@ open class Game : ApplicationListener {
 
     companion object {
         fun restart() {
-            World.world.restart()
-            renderer.reset()
+            World.world.start()
         }
 
         lateinit var currentGame: Game
@@ -64,10 +64,20 @@ open class Game : ApplicationListener {
     override fun dispose() {
     }
 
+    val performanceCounter: PerformanceCounter = PerformanceCounter("GAME")
+
     override fun render() {
+        performanceCounter.start()
         // We use the current world static variable because if the user wants to change to another world he can do it.
         renderer.renderOptimized(World.world)
+        performanceCounter.stop()
+        Gdx.app.log("RENDERER TIME", "${performanceCounter.current * 10000f}")
+        performanceCounter.reset()
+        performanceCounter.start()
         World.world.update()
+        performanceCounter.stop()
+        Gdx.app.log("WORLD TIME", "${performanceCounter.current * 10000f}")
+        performanceCounter.reset()
     }
 
     override fun resize(width: Int, height: Int) {

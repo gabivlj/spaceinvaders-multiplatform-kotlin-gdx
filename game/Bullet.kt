@@ -1,6 +1,7 @@
 package architecture.game
 
 import architecture.engine.World
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
@@ -9,7 +10,7 @@ import java.util.logging.Level
 open class Bullet(pos: Vector2,
                   private val dir: Vector2,
                   private val onHit: () -> (Unit),
-                  private val sprites: Array<Sprite>,
+                  sprites: Array<Sprite>,
                   private val speed: Float,
                   private val damage: Float,
                   w: Float = 50f,

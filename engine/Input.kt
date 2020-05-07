@@ -159,7 +159,6 @@ class Input : InputProcessor, GestureDetector.GestureListener, ControllerListene
      *  CIRCLE: 3
      */
     override fun axisMoved(controller: Controller?, axisCode: Int, value: Float): Boolean {
-        if (controller != null && (value > 0.5f || value < -0.5F)) Gdx.app.log("AXIS", "AXIS CODE: $axisCode and value $value in controller ${controller.toString()}")
         input.subscribers.forEach { it.axisMoved(controller, axisCode, value) }
         return false
     }
