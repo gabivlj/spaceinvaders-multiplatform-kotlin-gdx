@@ -250,7 +250,8 @@ class Config {
             return enemies.toTypedArray()
         }
 
-        private fun randomSetOfPoint(): Array<Point> {
+
+        fun randomSetOfPoint(): Array<Point> {
             val points: MutableList<Point> = mutableListOf()
             for (i in 0..2) {
                 points.add(

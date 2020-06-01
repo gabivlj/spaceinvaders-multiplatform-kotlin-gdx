@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
 
 class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
-    val shape: ShapeRenderer = ShapeRenderer()
+    var shape: ShapeRenderer? = null
     var player: Player? = null
     var text: Text = Text()
 
@@ -43,32 +43,37 @@ class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
             World.world.destroy(this)
             text.stop()
         }
+        shape = ShapeRenderer()
 
     }
 
     override fun update(dt: Float) {
         val deg = ((player!!.hp * 360f)) / 100f
-        shape.color = Color.GREEN
-        shape.begin(ShapeRenderer.ShapeType.Filled)
-        shape.arc(550.0f, Gdx.graphics.height - 60f, 60f, 90f, deg)
-        shape.color = Color.BROWN
-        shape.circle(550.0f, Gdx.graphics.height - 60f, 40f)
+        shape!!.color = Color.GREEN
+        shape!!.begin(ShapeRenderer.ShapeType.Filled)
+        shape!!.arc(550.0f, Gdx.graphics.height - 60f, 60f, 90f, deg)
+        shape!!.color = Color.BROWN
+        shape!!.circle(550.0f, Gdx.graphics.height - 60f, 40f)
 
         if (player!!.currentShot != Player.CurrentShot.NORMAL) {
-            shape.color = Color.VIOLET
+            shape!!.color = Color.VIOLET
             val degShoot =  (360f / 100) * ((player!!.currentAmmo * 100) / player!!.currentShot.ammo)
-            shape.arc(Gdx.graphics.width - 60f, Gdx.graphics.height - 60f, 60f, 90f, degShoot)
-            shape.color = Color.PURPLE
-            shape.circle(Gdx.graphics.width - 60f, Gdx.graphics.height - 60f, 40f)
+            shape!!.arc(Gdx.graphics.width - 60f, Gdx.graphics.height - 60f, 60f, 90f, degShoot)
+            shape!!.color = Color.PURPLE
+            shape!!.circle(Gdx.graphics.width - 60f, Gdx.graphics.height - 60f, 40f)
         }
-        shape.end()
+        shape!!.end()
 
         text.text = "${player!!.score}"
         text.position = player!!.position
     }
 
     override fun onDispose() {
-        shape.dispose()
+        Gdx.app.log("disposed", "DISPOSE")
+        if (shape != null) {
+            shape!!.dispose()
+            shape = null
+        }
         text.stop()
     }
 

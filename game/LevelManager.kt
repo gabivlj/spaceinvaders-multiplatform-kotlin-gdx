@@ -39,8 +39,8 @@ class Spawn (val positionToSpawn: Float, val enemies: Array<BasicEnemy>, val tim
 
         if (timeBetweenSpawns <= time) {
             time = 0.0f
-            val enemy = World.world.instantiate(enemies[currentEnemy])
-            enemy.position = Vector2(player.position.x + offsetPlayerX, LevelManager.level.topBounds)
+//            val enemy = World.world.instantiate(enemies[currentEnemy])
+//            enemy.position = Vector2(player.position.x + offsetPlayerX, LevelManager.level.topBounds)
             currentEnemy++
         }
 
@@ -143,8 +143,10 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
         }
     }
 
+    var cameraSpeed = 20.0f
+
     private fun cameraWork(dt: Float) {
-        camera.position.y += dt * 20f
+        camera.position.y += dt * cameraSpeed
         topBounds = camera.viewportHeight / 2 + camera.position.y
         leftBounds = Background.currentBackground.position.x
         rightBounds = Background.currentBackground.position.x + Background.currentBackground.width

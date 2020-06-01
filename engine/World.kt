@@ -11,16 +11,17 @@ import com.badlogic.gdx.utils.PerformanceCounter
 
 /**
  * TODO:
- *  - dont delete instances in that moment, wait to delete them all.
- *  - have various cameras. []cameras
- *  - have colliders
- *  - put healthbar, special bar next to player
+ *  - dont delete instances in that moment, wait to delete them all. x
+ *  - have various cameras. []cameras x -> do ?
+ *  - have colliders -> definitely do
+ *  - put healthbar, special bar next to player -> do
  *  - have a variable called screenCameras which is an array of cameras, depending of the number of cameras
- *    in that array the screen is splitted differently
- *  - sounds
- *  - have menu that lets you choose n of players and map
- *  - have final boss
- *  - have end screen which tells you your score
+ *    in that array the screen is splitted differently -> do
+ *  - sounds -> do
+ *  - have menu that lets you choose n of players and map -> do
+ *  - have final boss -> do
+ *  - have end screen which  tells you your score. that score is saved in a static variable which will let you buy new ships that have more speed etc.
+ *  - menu choose map loaded by json, each map has spawners which tell how many enemies of each type,
  */
 class World {
     // region Private
@@ -129,9 +130,13 @@ class World {
     fun destroy(gameObject: GameObject) {
         if (gameObject.currentPass != currentPass) gameObject.flagDestroyed = true
         else {
-            if (!restarted)
+            if (!restarted) {
+                gameObject.observeDestroy?.invoke(gameObject)
                 gameObject.onDestroy()
+
+            }
             gameObject.onDispose()
+
         }
         gameObjects.removeValue(gameObject, true)
     }
@@ -162,9 +167,10 @@ class World {
         val dt = Gdx.graphics.deltaTime
         currentIteration = gameObjects.filter { it.active }
         for (gameObject in currentIteration) {
-            if (restarted) gameObject.onDispose()
+            if (restarted) { gameObject.onDispose(); continue }
             else if (gameObject.flagDestroyed) {
                 gameObject.onDestroy()
+                gameObject.observeDestroy?.invoke(gameObject)
                 gameObject.onDispose()
                 continue
             }

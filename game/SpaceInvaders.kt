@@ -33,6 +33,13 @@ class SpaceInvaders : Game() {
     lateinit var rendererBackground: RendererOptimizer
 
     private fun startForGameplayWorld() {
+        val map = LoaderSpawner.Load()
+        if (map == null) {
+            Gdx.app.log("BAD", "BAAAD")
+        } else {
+            Gdx.app.log("YESSS", "$map")
+            MapStatics.currentMap = map.maps[0]
+        }
         rendererOpt = RendererOptimizer()
         rendererBackground = RendererOptimizer()
         sprites = rendererOpt.consumeSprites("ASSETS_08")
@@ -109,6 +116,7 @@ class SpaceInvaders : Game() {
         Gdx.graphics.setResizable(false)
         Gdx.graphics.setWindowedMode(1020, 530)
         World.setCurrentWorld(worlds[1])
+
         // Set the onStart of this world
         worlds[1].onStart =  { startForGameplayWorld() }
         worlds[1].onFinish = {
@@ -138,6 +146,7 @@ class SpaceInvaders : Game() {
 
     private fun instantiation() {
         instantiatePlayerAndJoysticks()
+        World.world.instantiate(SpawningBehaviour())
         World.world.instantiate(Enemy(Vector2(100f, 100f)))
         World.world.instantiate(SpecialAttackBar())
 

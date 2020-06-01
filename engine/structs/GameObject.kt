@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 
 
+
 open class GameObject(spritesSet: Array<Sprite> = arrayOf(), w: Float = 500.0f, h: Float = 500.0f, position: Vector2 = Vector2(100.0f, -100.0f)) {
 
     var flagDestroyed: Boolean = false
@@ -20,6 +21,7 @@ open class GameObject(spritesSet: Array<Sprite> = arrayOf(), w: Float = 500.0f, 
     var spriteIndex: Int = 0
     var tag: String = ""
     var currentPass: Int = 0
+    var observeDestroy: ((GameObject) -> Unit)? = null
 
     val sizeSprites: Int
     get() {

@@ -67,17 +67,17 @@ open class Game : ApplicationListener {
     val performanceCounter: PerformanceCounter = PerformanceCounter("GAME")
 
     override fun render() {
-        performanceCounter.start()
+//        performanceCounter.start()
         // We use the current world static variable because if the user wants to change to another world he can do it.
         renderer.renderOptimized(World.world)
-        performanceCounter.stop()
-        Gdx.app.log("RENDERER TIME", "${performanceCounter.current * 10000f}")
-        performanceCounter.reset()
-        performanceCounter.start()
+//        performanceCounter.stop()
+//        Gdx.app.log("RENDERER TIME", "${performanceCounter.current * 10000f}")
+//        performanceCounter.reset()
+//        performanceCounter.start()
         World.world.update()
         performanceCounter.stop()
-        Gdx.app.log("WORLD TIME", "${performanceCounter.current * 10000f}")
-        performanceCounter.reset()
+//        Gdx.app.log("WORLD TIME", "${performanceCounter.current * 10000f}")
+//        performanceCounter.reset()
     }
 
     override fun resize(width: Int, height: Int) {
