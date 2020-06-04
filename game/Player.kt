@@ -1,5 +1,8 @@
 package architecture.game
 
+import architecture.engine.Audio
+import architecture.engine.AudioID
+import architecture.engine.AudioType
 import architecture.engine.World
 import architecture.engine.structs.GameObjectInput
 import architecture.engine.structs.IJoystick
@@ -27,21 +30,19 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
         ENERGY(3, 8f, 30..30, 53f, 1000f, Vector2(20f, 100f)),
         MISSILE(1, 28f, 31..31, 0f, 1500f, Vector2(30f, 110f), 500f)
     }
-
     var currentShot: CurrentShot = CurrentShot.NORMAL
     var currentAmmo: Float = 1000f
-
     var score: Float = 0.0f
+    var hp = 100.0f
+    var accumulatorSpecialAttack = 0.0f
 
     private var cooldownAttack: Float = 1.0f
     private var canAttack: Float = 0.3f
-
     // We start -4 because we want immunity at the start of the game just in case
     private var cooldownAccReceivingDamage: Float = -4.0f
-
     private val cooldownReceivingDamage: Float = 1.0f
-    var hp = 100.0f
-    var accumulatorSpecialAttack = 0.0f
+    private lateinit var audioShoot: AudioID
+
 
 
     override fun keyDown(keycode: Int): Boolean {
@@ -51,15 +52,15 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     override fun start() {
         super.start()
         specialAttackJoy.subscribe(this)
+        audioShoot = Audio.add("shoot.mp3", AudioType.TRACK)
+        activateCollisions()
     }
 
     override fun update(dt: Float) {
-
         if (hp <= 0f) {
             SpaceInvaders.worlds[1].start()
             return
         }
-
         cooldownAccReceivingDamage += dt
         World.world.overlaps(this)
         val direction = movementJoystick.dir()
@@ -72,22 +73,17 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             position.x += direction.x * 200 * dt * distance
             position.y += direction.y * 200 * dt * distance
         }
-
         if (LevelManager.level.initialized) {
             position.x = MathUtils.clamp(position.x, LevelManager.level.leftBounds, LevelManager.level.rightBounds - width)
             position.y = MathUtils.clamp(position.y, LevelManager.level.bottomBounds + 1, LevelManager.level.topBounds - height)
         }
         flipX = direction.x > 0.0f
-
         spriteIndex = when {
             abs(direction.x) > 0.8f -> 2
             abs(direction.x) > 0.5f -> 1
             else                    -> 0
         }
-
         cooldownAttack += dt
-
-
         val dist = attackJoystick.dist()
         if (dist < 0.1f) {
             return
@@ -99,9 +95,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
      *
      */
     private fun shoot() {
-
         val dir = attackJoystick.dir().cpy()
-        // TODO: Check if using Gamepad or Mobile.
         rotation = (MathUtils.atan2(dir.y, dir.x) * 180 / Math.PI.toFloat()) - 90
         if (cooldownAttack < canAttack) {
             return
@@ -118,7 +112,6 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             bullet.width = currentShot.size.x
             bullet.height = currentShot.size.y
             val bull = World.world.instantiate(bullet)
-
             // -90 deg because the sprite is already looking up
             bull.rotation = (MathUtils.atan2(dir.y, dir.x) * 180 / Math.PI.toFloat()) - 90
             val pos = position.cpy()
@@ -129,18 +122,16 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
                 pos.y += i * ((height / 2) - (bull.width / 2) + currentShot.margin) / currentShot.nBullets.toFloat()
                 pos.y -= currentShot.margin / 2
             }
-//            pos.y += height / 2
             bull.position = pos
         }
         if (currentShot != CurrentShot.NORMAL) {
             currentAmmo -= 50f
         }
-
         cooldownAttack = 0.0f
-
         if (currentAmmo <= 0) {
             currentShot = CurrentShot.NORMAL
         }
+        Audio.play(audioShoot)
     }
 
     override fun buttonDownParsed(controller: PhysicalJoystick, whatToListen: ToListen) {
@@ -192,13 +183,13 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
                 World.world.destroy(other)
             }
             is BulletEnemy -> {
-                hp -= 10
+                hp -= 10 * Config.difficulty.multiplierDamage
                 World.world.destroy(other)
             }
             is BasicEnemy -> {
                 if (cooldownAccReceivingDamage <= cooldownReceivingDamage) return
                 cooldownAccReceivingDamage = 0.0f
-                hp -= 20f
+                hp -= 20f * Config.difficulty.multiplierDamage
             }
         }
     }

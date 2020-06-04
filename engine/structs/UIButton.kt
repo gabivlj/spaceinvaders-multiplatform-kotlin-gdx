@@ -18,6 +18,9 @@ enum class ButtonState(val index: Int) {
 class UIButton(sprites: Array<Sprite>,
                w: Float, h: Float, position: Vector2, var text: String, var offsetText: Vector2, var onClick: (UIButton) -> Unit) : UIElement(sprites, w, h, position) {
 
+    var onHover: (UIButton) -> Unit = { }
+    var stopHover: (UIButton) -> Unit = { }
+
     /**
      * The text element
      */
@@ -37,8 +40,8 @@ class UIButton(sprites: Array<Sprite>,
 
     override fun update(dt: Float) {
         super.update(dt)
+        textUI.text = text
         textUI.position = position.cpy().add(offsetText)
-        textUI.text = text + "state is ${state.name}"
         spriteIndex = state.index % sizeSprites
     }
 
@@ -46,6 +49,7 @@ class UIButton(sprites: Array<Sprite>,
         when (state) {
             ButtonState.IDLE -> {
                 state = ButtonState.HOVER
+                onHover(this)
             }
             else -> { }
         }
@@ -70,6 +74,7 @@ class UIButton(sprites: Array<Sprite>,
             }
             ButtonState.HOVER -> {
                 state = ButtonState.ACTIVE
+                stopHover(this)
             }
             else -> { }
         }
@@ -79,6 +84,7 @@ class UIButton(sprites: Array<Sprite>,
         when (state) {
             ButtonState.HOVER -> {
                 state = ButtonState.IDLE
+                stopHover(this)
             }
             else -> { }
         }

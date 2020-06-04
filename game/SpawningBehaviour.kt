@@ -35,6 +35,11 @@ class SpawningBehaviour(val map: Map = MapStatics.currentMap) : GameObject(array
         val players = World.world.findGameObjects<Player>()
         if (players.isEmpty) return
         player = players[0]
+        for (spawner in map.spawners) {
+            spawner.nEnemiesFollow *= Config.difficulty.multiplierNOfEnemies
+            spawner.nEnemiesNormal *= Config.difficulty.multiplierNOfEnemies
+            spawner.nBosses        *= Config.difficulty.multiplierNOfEnemies
+        }
         randomFn = arrayOf({
             if (currentSpawnerItem.nBosses <= 0) {
                 return@arrayOf null

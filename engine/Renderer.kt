@@ -12,7 +12,18 @@ import com.my.architecture.engine.structs.GameObject
 
 class Renderer {
     private lateinit var batch: SpriteBatch
+    /**
+     * The main camera of the camera that this library sets up for you
+     */
     lateinit var camera: OrthographicCamera
+    /**
+     * This is cameras, the list of cameras in your game that will try to render all
+     * at the same time (split screen for you)!
+     *
+     * Take into mind that the more cameras are in the game more rendering work is gonna happen.
+     */
+    lateinit var cameras: MutableList<OrthographicCamera>
+
     init {
         log.level = Logger.DEBUG
     }
@@ -23,7 +34,9 @@ class Renderer {
         public val log = Logger("rendererx")
         private var spritesStore: HashMap<String, Sprite> = HashMap()
         private var textures: MutableList<TextureRegion> = mutableListOf(TextureRegion())
-
+        /**
+         * Fill this if you are gonna have empty arrays in sprites in some objects
+         */
         public var fallback: () -> Sprite? = { null }
         /**
          * Render size. The camera will be affected by this.
@@ -125,44 +138,55 @@ class Renderer {
     fun reset() {
         textUI = mutableListOf()
         Animator.animations = mutableListOf()
+        cameras = mutableListOf(camera)
     }
 
     fun renderOptimized(world: World) {
-        Gdx.gl.glClearColor(0f, 1.0f, 1.0f, 1.0f);
+        Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        batch.projectionMatrix = camera.combined
-        Animator.animations.forEach { animation -> animation.update() }
+        Animator.animations.forEach { it.update() }
         batch.begin()
-
-
-        for (gameObject in world.gameObjects) {
-            if (!gameObject.active) continue
-            gameObject.sprite().setOrigin(gameObject.width / 2, gameObject.height / 2)
-            gameObject.sprite().rotation = gameObject.rotation
-            gameObject.sprite().setBounds(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height)
-            gameObject.sprite().setPosition(gameObject.position.x, gameObject.position.y)
-            gameObject.sprite().setScale(if (gameObject.flipX) -1.0f else 1.0f, 1.0f)
-            gameObject.sprite().draw(batch)
+        for ((nCamera, cameraItem) in cameras.withIndex()) {
+            renderCamera(cameraItem, nCamera, world)
         }
-
-
-
-        for (text in textUI) {
-            text.font.draw(batch, text.text, text.position.x, text.position.y)
-        }
-
         batch.end()
         Gdx.app.log("RENDER CALLS", "${batch.renderCalls}")
         Gdx.app.log("FPS", "${Gdx.graphics.framesPerSecond}")
+    }
 
+    private fun renderCamera(cameraRender: OrthographicCamera, nCamera: Int, world: World) {
+        batch.projectionMatrix = cameraRender.combined
+        Gdx.gl.glViewport(
+                nCamera * Gdx.graphics.width / cameras.size,
+                0,
+                Gdx.graphics.width / cameras.size,
+                Gdx.graphics.height
+        )
+
+        for (gameObject in world.gameObjects) {
+            if (!gameObject.active) continue
+            val sprite = gameObject.sprite()
+            sprite.setOrigin(gameObject.width / 2, gameObject.height / 2)
+            sprite.rotation = gameObject.rotation
+            sprite.setBounds(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height)
+            sprite.setPosition(gameObject.position.x, gameObject.position.y)
+            sprite.setScale(if (gameObject.flipX) -1.0f else 1.0f, 1.0f)
+            batch.color = gameObject.tint
+            sprite.draw(batch)
+        }
+        for (text in textUI) {
+            text.font.data.scaleX = text.width
+            text.font.data.scaleY = text.height
+            text.font.draw(batch, text.text, text.position.x, text.position.y)
+        }
     }
 
     fun start() {
         batch = SpriteBatch(8191)
         camera = OrthographicCamera()
-
+        cameras = mutableListOf(camera)
         camera.position.set(0f, 0f, 0f)
         camera.viewportHeight = sizeRenderer.y
         camera.viewportWidth = sizeRenderer.x
@@ -171,6 +195,17 @@ class Renderer {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    }
+
+    fun addCamera(): OrthographicCamera {
+        val cameraToAdd = OrthographicCamera()
+        camera.position.set(0f, 0f, 0f)
+        cameras.add(cameraToAdd)
+        for (camera in cameras) {
+            camera.viewportHeight = sizeRenderer.y / cameras.size
+            camera.viewportWidth = sizeRenderer.x / cameras.size
+        }
+        return cameraToAdd
     }
 
 }

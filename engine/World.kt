@@ -1,5 +1,6 @@
 package architecture.engine
 
+import architecture.engine.structs.BoxCollider
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.controllers.Controllers
@@ -26,7 +27,8 @@ import com.badlogic.gdx.utils.PerformanceCounter
 class World {
     // region Private
     private var currentID: Int = 0
-    private var _gameObjects: com.badlogic.gdx.utils.Array<GameObject> = com.badlogic.gdx.utils.Array<GameObject>(1000)
+    private var _gameObjects: Array<GameObject> = Array(1000)
+    private var _colliders: Array<BoxCollider> = Array(1000)
 
     // endregion
 
@@ -96,8 +98,7 @@ class World {
         _gameObjects = Array(1000)
         Game.renderer.reset()
         onFinish()
-
-
+        Audio.dispose()
     }
 
     /**
@@ -109,12 +110,11 @@ class World {
         val inputs: InputMultiplexer = InputMultiplexer()
         val gesture = GestureDetector(_inputGesture)
         Controllers.addListener(_inputProcess)
-        // Add the gesture listener
         inputs.addProcessor(gesture)
-        // Add the input listener
         inputs.addProcessor(_inputProcess)
         Gdx.input.inputProcessor = inputs
         currentInput = _inputProcess
+        // If it isn't the first time that this is called, we dispose prev. world
         if (!firstStart) {
             world.dispose()
         }
@@ -154,7 +154,7 @@ class World {
         changedDepth()
         return gameObject
     }
-    var currentIteration: List<GameObject> = listOf()
+    var currentIteration: MutableList<GameObject> = mutableListOf()
 
     var performanceCounterMap: HashMap<String, Float> = hashMapOf()
     val performanceCounter: PerformanceCounter = PerformanceCounter("heh")
@@ -165,7 +165,17 @@ class World {
      */
     fun update() {
         val dt = Gdx.graphics.deltaTime
-        currentIteration = gameObjects.filter { it.active }
+        currentIteration = mutableListOf()
+        _colliders.clear()
+        for (gameObject in gameObjects) {
+            if (gameObject.active) {
+                currentIteration.add(gameObject)
+            }
+            if (gameObject.active && gameObject.collider.active) {
+                _colliders.add(gameObject.collider)
+            }
+        }
+
         for (gameObject in currentIteration) {
             if (restarted) { gameObject.onDispose(); continue }
             else if (gameObject.flagDestroyed) {
@@ -204,13 +214,14 @@ class World {
     fun overlaps(gameObject: GameObject): Boolean {
         var overlaps = false
         gameObject.sprite()?.setPosition(gameObject.position.x, gameObject.position.y)
-        for (element in currentIteration) {
+        for (collider in _colliders) {
+            if (!collider.active) continue
+            val element = collider.gameObject
             if (element.instanceID == gameObject.instanceID) continue
             // Reset because maybe the sprite has been compromised sharing references with other GameObjects
-            element.sprite()?.setPosition(element.position.x, element.position.y)
-            element.sprite()?.setSize(element.width, element.height)
-            gameObject.sprite()?.setPosition(gameObject.position.x, gameObject.position.y)
-            if (!Intersector.overlaps(element.sprite()?.boundingRectangle, gameObject.sprite()?.boundingRectangle)) continue
+            element.sprite().setPosition(element.position.x, element.position.y)
+            gameObject.sprite().setPosition(gameObject.position.x, gameObject.position.y)
+            if (!gameObject.collider.overlaps(collider)) continue
             gameObject.onCollide(element)
             element.onCollide(gameObject)
             overlaps = true
@@ -223,7 +234,7 @@ class World {
      * @return gameObjects
      */
     inline fun <reified T: GameObject> findGameObjects(): com.badlogic.gdx.utils.Array<T> {
-        val gameObjectsToReturn = com.badlogic.gdx.utils.Array<T>(gameObjects.size)
+        val gameObjectsToReturn = Array<T>(gameObjects.size)
         for (element in currentIteration) {
             if (element is T) {
                 gameObjectsToReturn.add(element)

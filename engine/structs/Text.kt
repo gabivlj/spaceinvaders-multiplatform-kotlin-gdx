@@ -9,7 +9,8 @@ class Text {
     var text: String = ""
     val font: BitmapFont
         get() { return bitmapFont }
-
+    var width = 1f
+    var height = 1f
     private val bitmapFont: BitmapFont = BitmapFont()
 
     init {

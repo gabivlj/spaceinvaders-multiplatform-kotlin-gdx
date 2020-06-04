@@ -1,7 +1,9 @@
 package architecture.game
 
+import architecture.engine.Audio
 import architecture.engine.World
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
@@ -18,6 +20,7 @@ open class Bullet(pos: Vector2,
     : GameObject(sprites, w, h, pos.cpy()) {
 
     override fun start() {
+        activateCollisions()
     }
 
     override fun update(dt: Float) {
@@ -39,6 +42,12 @@ open class Bullet(pos: Vector2,
             is BasicEnemy -> {
                 other.hp -= damage
                 if (other.hp <= 0) {
+                    if (BasicEnemy.explosionSound != null) {
+                        Audio.apply<Sound>(BasicEnemy.explosionSound!!) {
+                            val id = Audio.play(BasicEnemy.explosionSound!!)
+                            it.setVolume(id, .24f)
+                        }
+                    }
                     other.player.score += 125f
                 }
                 onHit()

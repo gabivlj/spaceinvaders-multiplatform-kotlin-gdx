@@ -2,42 +2,66 @@ package com.my.architecture.engine.structs
 
 import architecture.engine.Renderer
 import architecture.engine.World
+import architecture.engine.structs.BoxCollider
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 
 
 
-open class GameObject(spritesSet: Array<Sprite> = arrayOf(), w: Float = 500.0f, h: Float = 500.0f, position: Vector2 = Vector2(100.0f, -100.0f)) {
-
+open class GameObject(
+        var sprites: Array<Sprite> = arrayOf(),
+        w: Float = 500.0f,
+        h: Float = 500.0f,
+        var position: Vector2 = Vector2(100.0f, -100.0f)
+) {
     var flagDestroyed: Boolean = false
     var flipX: Boolean = false
     var flipY: Boolean = false
     var initialized: Boolean = false
     var width: Float = w
     var height: Float = h
-    var position: Vector2 = position
     var rotation: Float = 0.0f
     var active: Boolean = true
     var spriteIndex: Int = 0
     var tag: String = ""
     var currentPass: Int = 0
     var observeDestroy: ((GameObject) -> Unit)? = null
-
+    var tint: Color = Color.WHITE
     val sizeSprites: Int
     get() {
         return sprites.size
     }
-
     var depth: Int = 20
         set(value) {
-            World.world.changedDepth()
             field = value
+            World.world.changedDepth()
         }
-
-    public var sprites: Array<Sprite> = spritesSet
-
-
     var instanceID: Int = 0
+
+    private var colliderMutable: BoxCollider = BoxCollider(width, height, this)
+
+    val collider: BoxCollider
+        get() = colliderMutable
+
+    /**
+     * Activates the collisions in the gameObject
+     * @param width
+     * @param height
+     */
+    fun activateCollisions(width: Float = colliderMutable.width, height: Float = colliderMutable.height, useGameObjectDimensions: Boolean = false) {
+        if (useGameObjectDimensions) {
+            colliderMutable.useSprite = true
+            return
+        }
+        colliderMutable.width = width
+        colliderMutable.height = height
+        colliderMutable.active = true
+    }
+
+    fun deactivateCollisions() {
+        colliderMutable.active = false
+    }
 
     open fun update(dt: Float) {
 

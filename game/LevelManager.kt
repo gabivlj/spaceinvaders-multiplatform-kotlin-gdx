@@ -2,9 +2,13 @@ package architecture.game
 
 
 import architecture.engine.Game
+import architecture.engine.Renderer
 import architecture.engine.World
-import com.badlogic.gdx.Gdx
+import architecture.engine.structs.PhysicalJoystick
+import architecture.engine.structs.ToListen
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -101,13 +105,14 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
     var rightBounds: Float = 0.0f
     var leftBounds: Float = 0.0f
 
-    lateinit var currentPlayer: Player
+    lateinit var players: com.badlogic.gdx.utils.Array<Player>
     lateinit var camera: Camera
     var currentSpawner = 0
 
     init {
         World.world.instantiate(this)
         level = this
+//        addPlayer()
     }
 
     companion object {
@@ -125,12 +130,14 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
     }
 
     override fun start() {
-        currentPlayer = World.world.findGameObjects<Player>()[0]
+        players = World.world.findGameObjects()
         camera = Game.camera
-        camera.position.x = (Background.currentBackground.width / 2) - camera.viewportWidth / 2
-        camera.position.y = camera.viewportHeight
-        currentPlayer.position = Vector2(camera.position.x, camera.position.y)
-        camera.update()
+        for ((i, camera) in Game.renderer.cameras.withIndex()) {
+            camera.position.x = (Background.currentBackground.width / 2) - camera.viewportWidth / 2
+            camera.position.y = camera.viewportHeight
+            players[i].position = Vector2(camera.position.x, camera.position.y)
+            camera.update()
+        }
         level = this
     }
 
@@ -146,16 +153,46 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
     var cameraSpeed = 20.0f
 
     private fun cameraWork(dt: Float) {
-        camera.position.y += dt * cameraSpeed
-        topBounds = camera.viewportHeight / 2 + camera.position.y
-        leftBounds = Background.currentBackground.position.x
-        rightBounds = Background.currentBackground.position.x + Background.currentBackground.width
-        bottomBounds = camera.position.y - camera.viewportHeight / 2
-        val lerp = 3f
-        val position: Vector3 = camera.position
-        position.x += (currentPlayer.position.x - position.x) * lerp * dt
-        camera.position.x = MathUtils.clamp(camera.position.x, leftBounds + camera.viewportWidth / 2, rightBounds - camera.viewportWidth / 2)
-        camera.update()
+        for ((i, camera) in Game.renderer.cameras.withIndex()) {
+            camera.position.y += dt * cameraSpeed
+            topBounds = camera.viewportHeight / 2 + camera.position.y
+            leftBounds = Background.currentBackground.position.x
+            rightBounds = Background.currentBackground.position.x + Background.currentBackground.width
+            bottomBounds = camera.position.y - camera.viewportHeight / 2
+            val lerp = 3f
+            val position: Vector3 = camera.position
+            position.x += (players[i].position.x - position.x) * lerp * dt
+            camera.position.x = MathUtils.clamp(camera.position.x, leftBounds + camera.viewportWidth / 2, rightBounds - camera.viewportWidth / 2)
+            camera.update()
+        }
+    }
+
+    fun addPlayer() {
+        val camera = Game.renderer.addCamera()
+        val pos = camera.position
+        pos.x = Game.camera.position.x
+        pos.y = Game.camera.position.y
+        pos.z = Game.camera.position.z
+
+        val joystick01 = World.world.instantiate(PhysicalJoystick(
+                ToListen.NONE,
+                arrayOf(Input.Keys.H, Input.Keys.F, Input.Keys.T, Input.Keys.G),
+                2.5f
+        ))
+        val joystick02 = World.world.instantiate(PhysicalJoystick(
+                ToListen.NONE,
+                arrayOf(Input.Keys.L, Input.Keys.J, Input.Keys.I, Input.Keys.K),
+                2.5f
+        ))
+        val joystick03 = World.world.instantiate(PhysicalJoystick(
+                ToListen.NONE,
+                arrayOf(Input.Keys.Y, -1, Input.Keys.Y, -1),
+                2.5f
+        ))
+        val player = World.world.instantiate(Player(SpaceInvaders.sprites.slice(0..2).toTypedArray(), joystick01, joystick02, joystick03))
+        player.position.x = camera.position.x
+        player.position.y = camera.position.y
+        player.tint = Color.PURPLE
     }
 
 }

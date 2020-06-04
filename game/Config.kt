@@ -2,234 +2,35 @@ package architecture.game
 
 import com.badlogic.gdx.math.Vector2
 
+enum class Difficulty(
+        val multiplierDamage: Float,
+        val multiplierHp: Float,
+        val multiplierNOfEnemies: Int,
+        val spriteRoute: IntRange,
+        val msg: String
+) {
+    EASY(
+            .7f,
+            .5f,
+            1,
+            0..0,
+            "So you are going with the easy way"
+    ),
+    MEDIUM(1.0f, .75f, 1, 1..1, "It's ok"),
+    HARD(2.0f, .85f, 2, 2..2, "Up for a challenge?"),
+    REALLY_HARD(3.0f, .95f, 3, 3..3, "Death!"),
+    HOLY_THIS_IS_REAAAALLY_HARD(6.0f, 1f, 5, 4..4, "Impossible."),
+}
 
 class Config {
 
     companion object {
-        fun config01(): Array<BasicEnemy> {
-            return arrayOf(
-                    EnemyFollow(Vector2()),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.8f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.8f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.8f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    )
-            )
-        }
-        fun config02(): Array<BasicEnemy> {
-            return arrayOf(
-                    EnemyFollow(Vector2()),
-                    EnemyFollow(Vector2()),
-                    EnemyFollow(Vector2()),
-                    EnemyFollow(Vector2()),
-                    Enemy(Vector2(),
-                            50f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 3f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.8f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.8f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.8f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(-0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    ),
-                    Enemy(Vector2(),
-                            40f,
-                            arrayOf(
-                                    Point(Vector2(0.4f, -0.6f), 100f, 10f),
-                                    Point(Vector2(0.7f, -0.9f), 200f, 10f)
-                            )
-                    )
-            )
-        }
+        var currentScore: Float = 0.0f
+        var difficulty = Difficulty.MEDIUM
 
+        /**
+         * @deprecated
+         */
         fun randomConfig(size: Int): Array<BasicEnemy> {
             val enemies: MutableList<BasicEnemy> = mutableListOf()
             for (i in 1..size) {

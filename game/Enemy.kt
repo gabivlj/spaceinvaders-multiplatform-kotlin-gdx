@@ -1,10 +1,15 @@
 package architecture.game
 
+import architecture.engine.Audio
+import architecture.engine.AudioID
+import architecture.engine.AudioType
 import architecture.engine.World
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
+import kotlin.math.exp
 
 class Point(val dir: Vector2, val speed: Float, val duration: Float)
 
@@ -12,7 +17,14 @@ open class BasicEnemy(vecPos: Vector2 = Vector2(), sprites: Array<Sprite> = Spac
     : GameObject(sprites, w, h, vecPos) {
     lateinit var player: Player
 
+    companion object {
+        var explosionSound: AudioID? = null
+    }
+
     override fun start() {
+        activateCollisions()
+        explosionSound = Audio.add("explosion.mp3", AudioType.TRACK)
+        hp *= Config.difficulty.multiplierHp
         player = World.world.findGameObjects<Player>().last()
     }
 
@@ -24,6 +36,7 @@ open class BasicEnemy(vecPos: Vector2 = Vector2(), sprites: Array<Sprite> = Spac
 
         if (Math.random() > 0.4f)
             World.world.instantiate(Ammo(centerPos))
+
     }
 }
 
@@ -72,5 +85,8 @@ class Enemy(vecPos: Vector2, hp: Float = 100.0f, val points: Array<Point> = arra
 
     fun destroy() {
         World.world.destroy(this)
+        if (explosionSound != null) {
+            Audio.play(explosionSound!!)
+        }
     }
 }

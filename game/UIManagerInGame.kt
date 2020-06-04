@@ -13,31 +13,32 @@ import com.my.architecture.engine.structs.GameObject
 class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
     var shape: ShapeRenderer? = null
     var player: Player? = null
+    lateinit var players: com.badlogic.gdx.utils.Array<Player>
     var text: Text = Text()
 
 
-    val button: UIButton = UIButton(
-            SpaceInvaders.sprites.slice(0..3).toTypedArray(),
-            300f,
-            100f,
-            Vector2(Gdx.graphics.width / 2f, Gdx.graphics.height / 2f),
-            "Test button",
-            Vector2()) {
-                it.text = "Clicked"
-                Gdx.app.log("TEXT_CHANGE", "Click")
-            }
+//    val button: UIButton = UIButton(
+//            SpaceInvaders.sprites.slice(0..3).toTypedArray(),
+//            300f,
+//            100f,
+//            Vector2(Gdx.graphics.width / 2f, Gdx.graphics.height / 2f),
+//            "Test button",
+//            Vector2()) {
+//                it.text = "Clicked"
+//                Gdx.app.log("TEXT_CHANGE", "Click")
+//            }
 
 
     init {
         World.world.instantiate(this)
 
-        World.world.instantiate(button)
+//        World.world.instantiate(button)
     }
 
     override fun start() {
         text.text = "0"
         text.position = Vector2()
-
+        players = World.world.findGameObjects<Player>()
         player = World.world.findGameObjects<Player>()[0]
         if (player == null) {
             World.world.destroy(this)

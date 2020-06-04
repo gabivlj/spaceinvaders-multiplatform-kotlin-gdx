@@ -21,6 +21,7 @@ class Ammo(pos: Vector2) : GameObject(SpaceInvaders.sprites.slice(27..29).toType
         }
 
     override fun start() {
+        activateCollisions()
         super.start()
         spriteIndex = type.spriteIndex
     }

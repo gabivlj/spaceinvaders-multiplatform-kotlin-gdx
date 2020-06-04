@@ -16,6 +16,7 @@ class BulletEnemy(pos: Vector2,
                   h: Float = 75f,
                   val follow: Boolean) : Bullet(pos, dir, onHit, sprites, speed, damage, w, h) {
     override fun start() {
+        super.start()
         rotation = (MathUtils.atan2(dir.y, dir.x) * 180 / Math.PI.toFloat()) - 180
         if (!follow) return
         player = World.world.findGameObjects<Player>().last()

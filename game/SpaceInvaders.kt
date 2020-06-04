@@ -5,32 +5,56 @@ import architecture.engine.structs.IJoystick
 import architecture.engine.structs.PhysicalJoystick
 import architecture.engine.structs.ToListen
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import java.lang.Exception
 import kotlin.math.abs
 
+fun assert(good: Boolean) {
+    if (!good) throw Exception("Error asserting, expected ${true}; result = $good")
+}
 
 class SpaceInvaders : Game() {
 
-    // my worlds
-
-
-    fun assert(good: Boolean) {
-        if (!good) throw Exception("Error asserting, expected ${true}; result = $good")
-    }
 
     companion object {
         val worlds: Array<World> = arrayOf(World(), World())
         lateinit var sprites: MutableList<Sprite>
         lateinit var spritesBackground: MutableList<Sprite>
-
         lateinit var spaceInvaders: SpaceInvaders
+        lateinit var spritesMenus: MutableList<Sprite>
+
     }
 
+    val baseURL = "assets/sprites/256px"
     lateinit var rendererOpt: RendererOptimizer
     lateinit var rendererBackground: RendererOptimizer
+
+    private fun startForMenuWorld() {
+        val mapsLoad = LoaderSpawner.Load() ?: throw Exception("Maps not loaded")
+        val maps = mapsLoad.maps
+        rendererOpt = RendererOptimizer()
+        spritesMenus  = rendererOpt.consumeSprites("menu3")
+        if (spritesMenus.isEmpty()) {
+            assert(rendererOpt.sprite("easy.png"))
+            assert(rendererOpt.sprite("medium.png"))
+            assert(rendererOpt.sprite("hard.png"))
+            assert(rendererOpt.sprite("really-hard.png"))
+            assert(rendererOpt.sprite("even-harder.png"))
+            assert(rendererOpt.sprite("back.png"))
+            assert(rendererOpt.sprite("start_button.png"))
+            for (map in maps) {
+                assert(rendererOpt.sprite(map.background))
+                assert(rendererOpt.sprite(map.image))
+            }
+            spritesMenus = rendererOpt.consumeSprites()
+            rendererOpt.saveConsumedSprites("menu3")
+        }
+        Renderer.fallback = { spritesMenus.slice(0..0)[0] }
+        World.world.instantiate(MenuManager())
+    }
 
     private fun startForGameplayWorld() {
         val map = LoaderSpawner.Load()
@@ -43,7 +67,7 @@ class SpaceInvaders : Game() {
         rendererOpt = RendererOptimizer()
         rendererBackground = RendererOptimizer()
         sprites = rendererOpt.consumeSprites("ASSETS_08")
-        val baseURL = "assets/sprites/256px"
+
         if (sprites.isEmpty()) {
             // PLAYER SPRITE (0)
             assert(rendererOpt.sprite("$baseURL/PlayerRed_Frame_01_png_processed.png"))
@@ -113,9 +137,10 @@ class SpaceInvaders : Game() {
     }
 
     override fun start() {
+        Audio.muted = true
+
         Gdx.graphics.setResizable(false)
-        Gdx.graphics.setWindowedMode(1020, 530)
-        World.setCurrentWorld(worlds[1])
+        World.setCurrentWorld(worlds[0])
 
         // Set the onStart of this world
         worlds[1].onStart =  { startForGameplayWorld() }
@@ -127,16 +152,12 @@ class SpaceInvaders : Game() {
             rendererBackground.dispose()
         }
 
-        worlds[0].onStart =  { startForGameplayWorld() }
+        worlds[0].onStart =  { startForMenuWorld() }
         worlds[0].onFinish = {
-            sprites.forEach { it.texture.dispose() }
-            sprites = mutableListOf()
-            spritesBackground = mutableListOf()
+            spritesMenus.forEach { it.texture.dispose() }
+            spritesMenus = mutableListOf()
             rendererOpt.dispose()
-            rendererBackground.dispose()
         }
-
-
     }
 
     fun restart() {
@@ -255,7 +276,6 @@ class SpaceInvaders : Game() {
         } else if (!isMobile) {
             joystick01 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_STICK, arrayOf(Input.Keys.D, Input.Keys.A, Input.Keys.W, Input.Keys.S), 2.5f))
             joystick02 = World.world.instantiate(PhysicalJoystick(ToListen.RIGHT_STICK, arrayOf(Input.Keys.RIGHT, Input.Keys.LEFT, Input.Keys.UP, Input.Keys.DOWN), 2.5f))
-            // fuck (TODO: MAP BUTTONS)
             joystick03 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_FACE, arrayOf(Input.Keys.E, -1, Input.Keys.E, -1), 2.5f))
         }
 
