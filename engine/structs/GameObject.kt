@@ -32,6 +32,8 @@ open class GameObject(
     get() {
         return sprites.size
     }
+    var disposed: Boolean = false
+
     var depth: Int = 20
         set(value) {
             field = value

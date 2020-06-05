@@ -7,6 +7,7 @@ import architecture.engine.structs.ToListen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import java.lang.Exception
@@ -20,23 +21,38 @@ class SpaceInvaders : Game() {
 
 
     companion object {
-        val worlds: Array<World> = arrayOf(World(), World())
+        val worlds: Array<World> = arrayOf(World(), World(), World())
         lateinit var sprites: MutableList<Sprite>
         lateinit var spritesBackground: MutableList<Sprite>
         lateinit var spaceInvaders: SpaceInvaders
         lateinit var spritesMenus: MutableList<Sprite>
-
     }
 
     val baseURL = "assets/sprites/256px"
     lateinit var rendererOpt: RendererOptimizer
     lateinit var rendererBackground: RendererOptimizer
 
+    private fun startForTransition() {
+        rendererBackground = RendererOptimizer()
+        spritesMenus  = rendererBackground.consumeSprites("transition")
+        if (spritesMenus.isEmpty()) {
+            assert(rendererBackground.sprite("assets/back.png"))
+            assert(rendererBackground.sprite("assets/button-plus.png"))
+            spritesMenus = rendererBackground.consumeSprites()
+            rendererBackground.saveConsumedSprites("transition")
+        }
+        Renderer.fallback = { spritesMenus.slice(0..0)[0] }
+        World.world.instantiate(AfterGameManager())
+    }
+
     private fun startForMenuWorld() {
         val mapsLoad = LoaderSpawner.Load() ?: throw Exception("Maps not loaded")
         val maps = mapsLoad.maps
+        Config.maps = maps
+        Config.currentMapIdx = 0
         rendererOpt = RendererOptimizer()
-        spritesMenus  = rendererOpt.consumeSprites("menu3")
+        rendererBackground = RendererOptimizer()
+        spritesMenus  = rendererOpt.consumeSprites("MENU6XD")
         if (spritesMenus.isEmpty()) {
             assert(rendererOpt.sprite("easy.png"))
             assert(rendererOpt.sprite("medium.png"))
@@ -45,25 +61,20 @@ class SpaceInvaders : Game() {
             assert(rendererOpt.sprite("even-harder.png"))
             assert(rendererOpt.sprite("back.png"))
             assert(rendererOpt.sprite("start_button.png"))
-            for (map in maps) {
-                assert(rendererOpt.sprite(map.background))
-                assert(rendererOpt.sprite(map.image))
-            }
-            spritesMenus = rendererOpt.consumeSprites()
-            rendererOpt.saveConsumedSprites("menu3")
+            // 7..len(maps)
+            spritesBackground = rendererBackground.consumeSprites()
+            rendererOpt.saveConsumedSprites("MENU6XD")
         }
+        spritesBackground = mutableListOf()
+        for ((i, map) in maps.withIndex()) {
+            spritesBackground.add(Sprite(Texture(map.background)))
+        }
+        Gdx.app.log("MAP SIZE", "${spritesBackground.size}")
         Renderer.fallback = { spritesMenus.slice(0..0)[0] }
         World.world.instantiate(MenuManager())
     }
 
     private fun startForGameplayWorld() {
-        val map = LoaderSpawner.Load()
-        if (map == null) {
-            Gdx.app.log("BAD", "BAAAD")
-        } else {
-            Gdx.app.log("YESSS", "$map")
-            MapStatics.currentMap = map.maps[0]
-        }
         rendererOpt = RendererOptimizer()
         rendererBackground = RendererOptimizer()
         sprites = rendererOpt.consumeSprites("ASSETS_08")
@@ -123,15 +134,8 @@ class SpaceInvaders : Game() {
 
             rendererOpt.saveConsumedSprites("ASSETS_08")
         }
-
-
-        spritesBackground = rendererBackground.consumeSprites("ASSET_BACKGROUND3")
-        if (spritesBackground.isEmpty()) {
-            rendererBackground.sprite("assets/background/NebulaAqua-Pink.png")
-            spritesBackground = rendererBackground.consumeSprites()
-            rendererBackground.saveConsumedSprites("ASSET_BACKGROUND3")
-        }
-
+        spritesBackground = mutableListOf()
+        spritesBackground.add(Sprite(Texture(Config.currentMap.background)))
         instantiation()
         spaceInvaders = this
     }
@@ -141,21 +145,27 @@ class SpaceInvaders : Game() {
 
         Gdx.graphics.setResizable(false)
         World.setCurrentWorld(worlds[0])
-
+        worlds[2].onStart =  { startForTransition() }
+        worlds[2].onFinish = {
+            spritesMenus.forEach { it.texture.dispose() }
+            spritesMenus = mutableListOf()
+            rendererBackground.dispose()
+        }
         // Set the onStart of this world
         worlds[1].onStart =  { startForGameplayWorld() }
         worlds[1].onFinish = {
             sprites.forEach { it.texture.dispose() }
+            spritesBackground.forEach { it.texture.dispose() }
             sprites = mutableListOf()
             spritesBackground = mutableListOf()
             rendererOpt.dispose()
-            rendererBackground.dispose()
         }
 
         worlds[0].onStart =  { startForMenuWorld() }
         worlds[0].onFinish = {
             spritesMenus.forEach { it.texture.dispose() }
             spritesMenus = mutableListOf()
+            spritesBackground.forEach { it.texture.dispose() }
             rendererOpt.dispose()
         }
     }
@@ -170,7 +180,6 @@ class SpaceInvaders : Game() {
         World.world.instantiate(SpawningBehaviour())
         World.world.instantiate(Enemy(Vector2(100f, 100f)))
         World.world.instantiate(SpecialAttackBar())
-
         Background(spritesBackground[0])
         UIManagerInGame()
         LevelManager()
@@ -201,6 +210,10 @@ class SpaceInvaders : Game() {
                         diff.toFloat(),
                         Gdx.graphics.height - Gdx.graphics.height / 10f
                 ),
+                /**
+                 * SUPER OMEGA DEPRECATED.
+                 * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
+                 */
                 // dir() function
                 {
                     val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0
@@ -225,6 +238,10 @@ class SpaceInvaders : Game() {
                         (Gdx.graphics.width * 2f / 3f) + diff,
                         Gdx.graphics.height - Gdx.graphics.height / 10f
                 ),
+                /**
+                 * SUPER OMEGA DEPRECATED.
+                 * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
+                 */
                 // dir()
                 {
                     val x = if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) -1 else 0
@@ -257,6 +274,10 @@ class SpaceInvaders : Game() {
                  * When joy3AttackSpecial.dist() is called, this will be fired! (Only when not mobile)
                  *
                  * .dist() is called inside Player for getting inputs
+                 */
+                /**
+                 * SUPER OMEGA DEPRECATED.
+                 * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
                  */
                 {
                     val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0

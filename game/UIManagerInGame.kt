@@ -36,6 +36,7 @@ class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
     }
 
     override fun start() {
+        text = Text()
         text.text = "0"
         text.position = Vector2()
         players = World.world.findGameObjects<Player>()
@@ -70,7 +71,6 @@ class UIManagerInGame : GameObject(arrayOf(), 0.0f, 0.0f) {
     }
 
     override fun onDispose() {
-        Gdx.app.log("disposed", "DISPOSE")
         if (shape != null) {
             shape!!.dispose()
             shape = null

@@ -24,7 +24,7 @@ class UIButton(sprites: Array<Sprite>,
     /**
      * The text element
      */
-    lateinit var textUI: Text
+    var textUI: Text = Text()
 
     /**
      * Current state of this button
@@ -99,4 +99,11 @@ class UIButton(sprites: Array<Sprite>,
             else -> { /* Not supposed to happen */ }
         }
     }
+
+    override fun onDispose() {
+        super.onDispose()
+        textUI.stop()
+    }
+
+
 }

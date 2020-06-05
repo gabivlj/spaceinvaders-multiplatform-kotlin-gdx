@@ -5,6 +5,7 @@ import architecture.engine.AudioID
 import architecture.engine.AudioType
 import architecture.engine.World
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
@@ -22,6 +23,7 @@ open class BasicEnemy(vecPos: Vector2 = Vector2(), sprites: Array<Sprite> = Spac
     }
 
     override fun start() {
+        tint = Color(MathUtils.random(), MathUtils.random() , MathUtils.random(), .6f)
         activateCollisions()
         explosionSound = Audio.add("explosion.mp3", AudioType.TRACK)
         hp *= Config.difficulty.multiplierHp

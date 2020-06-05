@@ -66,6 +66,7 @@ open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosi
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         var touchPosition = Vector2(screenX.toFloat(), screenY.toFloat())
         touchPosition = V3V2(Game.camera.unproject(V2V3(touchPosition)))
+        sprite().setPosition(position.x, position.y)
         if (sprite().boundingRectangle.contains(touchPosition)) {
             pointers[pointer] = true
             touched(touchPosition, pointer)

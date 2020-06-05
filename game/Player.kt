@@ -57,6 +57,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     }
 
     override fun update(dt: Float) {
+        tint = com.badlogic.gdx.graphics.Color.PURPLE
         if (hp <= 0f) {
             SpaceInvaders.worlds[1].start()
             return
@@ -157,8 +158,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
         World.world.instantiate(SpecialBullet(position.cpy(), direction){ accumulatorSpecialAttack += 10f })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDispose() {
         specialAttackJoy.unsubscribe(this)
     }
 

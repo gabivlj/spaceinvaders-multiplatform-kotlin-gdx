@@ -152,8 +152,8 @@ class Renderer {
             renderCamera(cameraItem, nCamera, world)
         }
         batch.end()
-        Gdx.app.log("RENDER CALLS", "${batch.renderCalls}")
-        Gdx.app.log("FPS", "${Gdx.graphics.framesPerSecond}")
+//        Gdx.app.log("RENDER CALLS", "${batch.renderCalls}")
+//        Gdx.app.log("FPS", "${Gdx.graphics.framesPerSecond}")
     }
 
     private fun renderCamera(cameraRender: OrthographicCamera, nCamera: Int, world: World) {
@@ -173,7 +173,7 @@ class Renderer {
             sprite.setBounds(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height)
             sprite.setPosition(gameObject.position.x, gameObject.position.y)
             sprite.setScale(if (gameObject.flipX) -1.0f else 1.0f, 1.0f)
-            batch.color = gameObject.tint
+            sprite.color = gameObject.tint
             sprite.draw(batch)
         }
         for (text in textUI) {

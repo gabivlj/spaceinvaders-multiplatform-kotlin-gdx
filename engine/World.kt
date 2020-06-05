@@ -12,17 +12,11 @@ import com.badlogic.gdx.utils.PerformanceCounter
 
 /**
  * TODO:
- *  - dont delete instances in that moment, wait to delete them all. x
- *  - have various cameras. []cameras x -> do ?
- *  - have colliders -> definitely do
- *  - put healthbar, special bar next to player -> do
- *  - have a variable called screenCameras which is an array of cameras, depending of the number of cameras
- *    in that array the screen is splitted differently -> do
- *  - sounds -> do
- *  - have menu that lets you choose n of players and map -> do
  *  - have final boss -> do
- *  - have end screen which  tells you your score. that score is saved in a static variable which will let you buy new ships that have more speed etc.
- *  - menu choose map loaded by json, each map has spawners which tell how many enemies of each type,
+ *  - add 2 players
+ *  - particles
+ *  - music
+ *  - let player choose a color for the ship.
  */
 class World {
     // region Private
@@ -89,16 +83,16 @@ class World {
      * Will be called when this world is stopped being used and will reset everything (Sprites, Animations etc.) so the next world isn't being affected
      */
     private fun dispose() {
+        restarted = true
         gameObjects.forEach {
-            if (!it.active) it.onDispose()
-            if (currentPass != it.currentPass)
-                it.flagDestroyed = true
-            else it.onDispose()
+            it.onDispose()
+            it.disposed = true
         }
         _gameObjects = Array(1000)
         Game.renderer.reset()
         onFinish()
         Audio.dispose()
+        Input.input.subscribers = mutableListOf()
     }
 
     /**
@@ -133,10 +127,8 @@ class World {
             if (!restarted) {
                 gameObject.observeDestroy?.invoke(gameObject)
                 gameObject.onDestroy()
-
             }
             gameObject.onDispose()
-
         }
         gameObjects.removeValue(gameObject, true)
     }
@@ -177,6 +169,7 @@ class World {
         }
 
         for (gameObject in currentIteration) {
+            if (gameObject.disposed) continue
             if (restarted) { gameObject.onDispose(); continue }
             else if (gameObject.flagDestroyed) {
                 gameObject.onDestroy()
@@ -191,17 +184,9 @@ class World {
                 gameObject.start()
                 gameObject.initialized = true
             }
-            performanceCounter.start()
             gameObject.update(dt)
-            performanceCounter.stop()
-            performanceCounterMap[gameObject.toString()] = performanceCounter.current
-            performanceCounter.reset()
         }
-
         currentPass++
-
-        performanceCounterMap = hashMapOf()
-
         restarted = false
     }
 
@@ -213,7 +198,8 @@ class World {
      */
     fun overlaps(gameObject: GameObject): Boolean {
         var overlaps = false
-        gameObject.sprite()?.setPosition(gameObject.position.x, gameObject.position.y)
+        // NOTE: Consider deleting this!
+        gameObject.sprite().setPosition(gameObject.position.x, gameObject.position.y)
         for (collider in _colliders) {
             if (!collider.active) continue
             val element = collider.gameObject

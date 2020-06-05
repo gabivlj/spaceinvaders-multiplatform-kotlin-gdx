@@ -1,6 +1,7 @@
 package architecture.engine.structs
 
 import architecture.engine.Input
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.PovDirection
@@ -57,7 +58,8 @@ open class GameObjectInput(spritesSet: Array<Sprite> = arrayOf(), w: Float = 500
         Input.input.subscribe(this)
     }
 
-    override fun onDestroy() {
+    override fun onDispose() {
+        Gdx.app.log("DISPOSED", "BRO DISPOSED XD")
         Input.input.unsubscribe(this)
     }
 

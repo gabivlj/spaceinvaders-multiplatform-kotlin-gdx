@@ -22,12 +22,38 @@ enum class Difficulty(
     HOLY_THIS_IS_REAAAALLY_HARD(6.0f, 1f, 5, 4..4, "Impossible."),
 }
 
+enum class Item(val cost: Float, val sum: Float) {
+    ATTACK(1000f, .5f),
+    SPEED(1000f, .5f)
+}
+
 class Config {
 
     companion object {
+        var maps: Array<Map> = arrayOf()
+        var mapSpritesIdx = 0..0
+        var currentMapIdx: Int = 0
+        val currentMap: Map
+            get() = maps[currentMapIdx]
+        var scoreGainedInPhase: Float = 0.0f
         var currentScore: Float = 0.0f
         var difficulty = Difficulty.MEDIUM
-
+        var speed = 1.0f
+        var attack = 1.0f
+        fun buy(what: Item) {
+            if (what.cost > currentScore) {
+                return
+            }
+            currentScore -= what.cost
+            when (what) {
+                Item.ATTACK -> {
+                    attack += what.sum
+                }
+                Item.SPEED -> {
+                    speed += what.sum
+                }
+            }
+        }
         /**
          * @deprecated
          */

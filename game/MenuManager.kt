@@ -24,6 +24,10 @@ class MenuManager : GameObject(
     override fun start() {
         hoverSound = Audio.add("button_hover.mp3", AudioType.TRACK)
         clickSound = Audio.add("button_click.mp3", AudioType.TRACK)
+        showMenu()
+    }
+
+    private fun showMenu() {
         val buttonStart: UIButton = UIButton(
                 SpaceInvaders.spritesMenus.slice(6..6).toTypedArray(),
                 widthButtonStart,
@@ -32,17 +36,17 @@ class MenuManager : GameObject(
                 "",
                 Vector2()) {
             Audio.play(clickSound)
-            SpaceInvaders.worlds[1].start()
-
+//            SpaceInvaders.worlds[1].start()
+            showMapsToChoose()
         }.also { uiButton -> uiButton.onHover = {
             it.width *= 1.1f;
             it.height *= 1.1f
             Audio.play(hoverSound)
-         } }
-         .also { uiButton -> uiButton.stopHover = {
-                it.width = widthButtonStart;
-                it.height = heightButtonStart;
-          } }
+        } }
+                .also { uiButton -> uiButton.stopHover = {
+                    it.width = widthButtonStart;
+                    it.height = heightButtonStart;
+                } }
 
         World.world.instantiate(buttonStart)
         var pos = 100f
@@ -70,8 +74,25 @@ class MenuManager : GameObject(
             World.world.instantiate(easyButton)
             pos += 300f
         }
+    }
 
-
-
+   private fun showMapsToChoose() {
+        World.world.findGameObjects<GameObject>().forEach {
+            World.world.destroy(it)
+        }
+       val sprite = SpaceInvaders.spritesBackground
+        for ((idx, map) in sprite.withIndex()) {
+            World.world.instantiate(UIButton(
+                    arrayOf(sprite[idx]),
+                    400f,
+                    400f,
+                    Vector2(idx * 401 + 10f, Gdx.graphics.height / 2f),
+                    "${idx + 1}. ",
+                    Vector2()
+            ) {
+                Config.currentMapIdx = idx
+                SpaceInvaders.worlds[1].start()
+            })
+        }
     }
 }

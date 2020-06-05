@@ -8,13 +8,7 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType
 import com.my.architecture.engine.structs.GameObject
 
 
-class MapStatics {
-    companion object {
-        lateinit var currentMap: Map
-    }
-}
-
-class SpawningBehaviour(val map: Map = MapStatics.currentMap) : GameObject(arrayOf(), 0.0f, 0.0f, Vector2(0.0f, 0.0f)) {
+class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arrayOf(), 0.0f, 0.0f, Vector2(0.0f, 0.0f)) {
     private var currentSpawner = -1
     private var enemiesLeft = 0
     private var currentTime = 0.0f
@@ -59,7 +53,6 @@ class SpawningBehaviour(val map: Map = MapStatics.currentMap) : GameObject(array
         }, {
             if (currentSpawnerItem.nEnemiesNormal <= 0) return@arrayOf null
             currentSpawnerItem.nEnemiesNormal--
-            // todo: Put here multipliers of dif
             val enemy = Enemy(Vector2(posX, 0.0f), 100.0f, Config.randomSetOfPoint())
             enemy.observeDestroy = { enemiesLeft-- }
             enemy.position.y = enemy.height + LevelManager.level.topBounds
@@ -110,7 +103,9 @@ class SpawningBehaviour(val map: Map = MapStatics.currentMap) : GameObject(array
     override fun update(dt: Float) {
         // This is when we finish the phase
         if (finishedAllSpawns()) {
-            Gdx.app.log("Finished all spawns", "Yes, we did")
+            Config.scoreGainedInPhase = player.score
+            Config.currentScore += Config.scoreGainedInPhase
+            SpaceInvaders.worlds[2].start()
             return
         }
         // If we should pass to the next spawn (all the enemies are dead)
@@ -163,16 +158,15 @@ class LoaderSpawner {
                 json.setUsePrototypes(false)
                 json.ignoreUnknownFields = true
                 json.setOutputType(OutputType.json)
-                val file = Gdx.files.internal("assets/m.json")
-                val buff = file.file().readText()
                 val maps: Maps = json.fromJson(
                         Maps::class.java,
-                        buff
+                        Gdx.files.internal("m.json")
                 )
                 maps
             } catch (e: Throwable) {
                 Gdx.app.log("$e", "$e")
                 Gdx.app.log("LoaderSpawner $this","Error consuming from JSON from map. ${e.message}")
+                throw Exception(e)
                 null
             }
         }
@@ -189,9 +183,26 @@ class Maps  {
 }
 
 class Map {
+
     var spawners: Array<SpawnerMap> = arrayOf()
     var image: String = ""
     var background: String = ""
+    var name: String = ""
+
+    fun cpy(): Map {
+        val map = Map()
+        map.image = this.image
+        map.background = this.background
+        map.name = this.name
+        map.spawners = spawners.map { SpawnerMap(
+                it.nEnemiesFollow,
+                it.nEnemiesNormal,
+                it.nBosses,
+                it.velocityCamera,
+                it.timeBetweenSpawns
+        ) }.toTypedArray()
+        return map
+    }
 
     constructor(spawnersArr: Array<SpawnerMap>, imageNew: String, backgroundNew: String) {
         spawners = spawnersArr
