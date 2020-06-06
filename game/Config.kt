@@ -1,5 +1,6 @@
 package architecture.game
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 
 enum class Difficulty(
@@ -30,6 +31,7 @@ enum class Item(val cost: Float, val sum: Float) {
 class Config {
 
     companion object {
+        var colorOfShip: Color = Color.WHITE
         var maps: Array<Map> = arrayOf()
         var mapSpritesIdx = 0..0
         var currentMapIdx: Int = 0

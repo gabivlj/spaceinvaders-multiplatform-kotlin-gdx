@@ -11,16 +11,14 @@ import com.badlogic.gdx.math.Vector2
 
 open class GameObject(
         var sprites: Array<Sprite> = arrayOf(),
-        w: Float = 500.0f,
-        h: Float = 500.0f,
-        var position: Vector2 = Vector2(100.0f, -100.0f)
+        var width: Float = 0f,
+        var height: Float = 0f,
+        var position: Vector2 = Vector2(0f, 0f)
 ) {
     var flagDestroyed: Boolean = false
     var flipX: Boolean = false
     var flipY: Boolean = false
     var initialized: Boolean = false
-    var width: Float = w
-    var height: Float = h
     var rotation: Float = 0.0f
     var active: Boolean = true
     var spriteIndex: Int = 0

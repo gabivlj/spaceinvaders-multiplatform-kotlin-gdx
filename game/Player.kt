@@ -51,13 +51,13 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
 
     override fun start() {
         super.start()
+        tint = Config.colorOfShip
         specialAttackJoy.subscribe(this)
         audioShoot = Audio.add("shoot.mp3", AudioType.TRACK)
         activateCollisions()
     }
 
     override fun update(dt: Float) {
-        tint = com.badlogic.gdx.graphics.Color.PURPLE
         if (hp <= 0f) {
             SpaceInvaders.worlds[1].start()
             return

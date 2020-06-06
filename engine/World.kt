@@ -13,10 +13,10 @@ import com.badlogic.gdx.utils.PerformanceCounter
 /**
  * TODO:
  *  - have final boss -> do
- *  - add 2 players
- *  - particles
- *  - music
- *  - let player choose a color for the ship.
+ *  - add 2 players ----> oof
+ *  - particles --> ok
+ *  - music -> In Gameplay?
+ *  - UI Manager for buttons
  */
 class World {
     // region Private
@@ -95,18 +95,20 @@ class World {
         Input.input.subscribers = mutableListOf()
     }
 
+    lateinit var inputMultiplexer: InputMultiplexer
+
     /**
      * Starts this world and Game class will use it as the current world. Will call the onStart attribute so you can load all the initial gameObjects etc.
      * @see Game.render
      */
     fun start() {
         restarted = true
-        val inputs: InputMultiplexer = InputMultiplexer()
+        inputMultiplexer = InputMultiplexer()
         val gesture = GestureDetector(_inputGesture)
         Controllers.addListener(_inputProcess)
-        inputs.addProcessor(gesture)
-        inputs.addProcessor(_inputProcess)
-        Gdx.input.inputProcessor = inputs
+        inputMultiplexer.addProcessor(gesture)
+        inputMultiplexer.addProcessor(_inputProcess)
+        Gdx.input.inputProcessor = inputMultiplexer
         currentInput = _inputProcess
         // If it isn't the first time that this is called, we dispose prev. world
         if (!firstStart) {

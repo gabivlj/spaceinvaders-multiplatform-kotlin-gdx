@@ -141,8 +141,6 @@ class SpaceInvaders : Game() {
     }
 
     override fun start() {
-        Audio.muted = true
-
         Gdx.graphics.setResizable(false)
         World.setCurrentWorld(worlds[0])
         worlds[2].onStart =  { startForTransition() }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Logger
 import com.my.architecture.engine.structs.GameObject
 
@@ -134,8 +135,10 @@ class Renderer {
     }
 
     var textUI: MutableList<Text> = mutableListOf()
+    var textInputs: MutableList<TextField> = mutableListOf()
 
     fun reset() {
+        textInputs = mutableListOf()
         textUI = mutableListOf()
         Animator.animations = mutableListOf()
         cameras = mutableListOf(camera)
@@ -180,6 +183,9 @@ class Renderer {
             text.font.data.scaleX = text.width
             text.font.data.scaleY = text.height
             text.font.draw(batch, text.text, text.position.x, text.position.y)
+        }
+        for (textInput in textInputs) {
+            textInput.draw(batch, 1f)
         }
     }
 
