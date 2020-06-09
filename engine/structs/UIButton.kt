@@ -12,8 +12,6 @@ enum class ButtonState(val index: Int) {
 
 /**
  * @param sprites 0 -> IDLE, 1 -> ACTIVE, 2 -> HOVER
- * @todo subscriber notifications
- * @todo move with IJoystick
  */
 class UIButton(sprites: Array<Sprite>,
                w: Float, h: Float, position: Vector2, var text: String, var offsetText: Vector2, var onClick: (UIButton) -> Unit) : UIElement(sprites, w, h, position) {
@@ -77,6 +75,12 @@ class UIButton(sprites: Array<Sprite>,
                 stopHover(this)
             }
             else -> { }
+        }
+    }
+
+    fun clickedFromOutside() {
+        when (state) {
+            else -> { onClick(this); stopHover(this); onHover(this); state = ButtonState.HOVER }
         }
     }
 

@@ -14,7 +14,7 @@ class BulletEnemy(pos: Vector2,
                   damage: Float,
                   w: Float = 50f,
                   h: Float = 75f,
-                  val follow: Boolean) : Bullet(pos, dir, onHit, sprites, speed, damage, w, h) {
+                  val follow: Boolean) : Bullet(pos, null, dir, onHit, sprites, speed, damage, w, h) {
     override fun start() {
         super.start()
         rotation = (MathUtils.atan2(dir.y, dir.x) * 180 / Math.PI.toFloat()) - 180

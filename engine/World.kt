@@ -14,8 +14,6 @@ import com.badlogic.gdx.utils.PerformanceCounter
  * TODO:
  *  - have final boss -> do
  *  - add 2 players ----> oof
- *  - particles --> ok
- *  - music -> In Gameplay?
  *  - UI Manager for buttons
  */
 class World {

@@ -20,6 +20,16 @@ class AudioID(val ID: Int, val type: AudioType) {
 class Audio {
     companion object {
         var muted: Boolean = false
+        set(value) {
+            if (value) {
+                mutableSounds.forEach { it.pause() }
+                Gdx.app.log("PAUSE", " PAUSAAA ")
+                mutableMusic.forEach { it.pause() }
+            } else {
+                mutableMusic.forEach { it.play() }
+            }
+            field = value
+        }
         private val mutableSounds: MutableList<Sound> = mutableListOf()
 
         val sounds: Array<Sound>
@@ -28,7 +38,6 @@ class Audio {
         private val mutableMusic: MutableList<Music> = mutableListOf()
         val music: Array<Music>
             get() { return mutableMusic.toTypedArray() }
-
 
         /**
          * Loads a new audio of the type @param type

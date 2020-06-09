@@ -2,9 +2,10 @@ package architecture.game
 
 import com.badlogic.gdx.math.Vector2
 
-class SpecialBullet(pos: Vector2, dir: Vector2, onHit: () -> (Unit))
+class SpecialBullet(pos: Vector2, parent: Player, dir: Vector2, onHit: () -> (Unit))
     : Bullet(
         pos,
+        parent,
         dir,
         onHit,
         SpaceInvaders.sprites.slice(23..23).toTypedArray(),

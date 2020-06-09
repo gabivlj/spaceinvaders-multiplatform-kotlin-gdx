@@ -9,7 +9,7 @@ class EnemyFollow(pos: Vector2) : BasicEnemy(pos, SpaceInvaders.sprites.slice(26
 
     override fun update(dt: Float) {
         super.update(dt)
-
+        effect?.setPosition(position.x + width / 2, position.y + height / 1.1f)
         if (hp <= 0) {
             World.world.destroy(this)
             return

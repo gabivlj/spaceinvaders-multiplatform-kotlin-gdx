@@ -22,8 +22,8 @@ class AfterGameManager : GameObject(arrayOf(), 0f, 0f, Vector2(0f, 0f)) {
         text.height = 5f
         val buttonNextPhase = UIButton(
                 SpaceInvaders.spritesMenus.slice(0..0).toTypedArray(),
-                50f,
-                50f,
+                100f,
+                100f,
                 Vector2((Gdx.graphics.width / 2f) - (100f / 4), Gdx.graphics.height / 4f),
                 "Start Next phase!",
                 Vector2()) {
@@ -38,17 +38,28 @@ class AfterGameManager : GameObject(arrayOf(), 0f, 0f, Vector2(0f, 0f)) {
         }
         val speedButton = UIButton(
                 SpaceInvaders.spritesMenus.slice(0..0).toTypedArray(),
-                50f,
-                50f,
-                Vector2((Gdx.graphics.width / 2f) - (100f / 4), Gdx.graphics.height / 2f),
+                100f,
+                100f,
+                Vector2((Gdx.graphics.width / 2f) - (100f / 4), Gdx.graphics.height / 4f + 100f),
                 "Buy more speed? Cost: 1000 score",
                 Vector2()) {
-            Gdx.app.log("sdasdadas", "dajfsdjfdsjfsdajfdas")
             Config.buy(Item.SPEED)
+        }
+        val attackButton = UIButton(
+                SpaceInvaders.spritesMenus.slice(0..0).toTypedArray(),
+                100f,
+                100f,
+                Vector2((Gdx.graphics.width / 2f) - (100f / 4), Gdx.graphics.height / 2f),
+                "Buy more attack? Cost: 1000 score",
+                Vector2()) {
+            Config.buy(Item.ATTACK)
         }
         speedButton.textUI.width = 2f
         speedButton.textUI.height = 2f
+        attackButton.textUI.width = 2f
+        attackButton.textUI.height = 2f
         World.world.instantiate(speedButton)
+        World.world.instantiate(attackButton)
         World.world.instantiate(buttonNextPhase)
         Game.camera.position.set(0.0f, 0.0f, 0.0f)
         Game.camera.update()

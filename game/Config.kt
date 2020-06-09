@@ -31,6 +31,9 @@ enum class Item(val cost: Float, val sum: Float) {
 class Config {
 
     companion object {
+        // In what number will be the score increased.
+        val sumScore: Float = 500f
+        var nPlayers: Int = 2
         var colorOfShip: Color = Color.WHITE
         var maps: Array<Map> = arrayOf()
         var mapSpritesIdx = 0..0

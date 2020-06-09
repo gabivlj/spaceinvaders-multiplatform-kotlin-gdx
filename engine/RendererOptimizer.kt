@@ -41,17 +41,15 @@ class TextureOptimizer() {
     var currentY: Int = 0
     var maxX: Int = 0
     var maxY: Int = 0
-    var size: Int = 10000
+    var size: Int = 4000
     var pixmap: Pixmap
     var tInfos: MutableList<TextureInfo> = mutableListOf()
 
     init {
         val intBuffer: IntBuffer = BufferUtils.newIntBuffer(16)
-        Gdx.gl20.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer)
-        size = intBuffer.get()
-        log.error("$size")
-        pixmap = Pixmap(2000, 2000, Pixmap.Format.RGBA8888)
+        pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888)
     }
+
     companion object {
         val log = Logger("renderer")
     }

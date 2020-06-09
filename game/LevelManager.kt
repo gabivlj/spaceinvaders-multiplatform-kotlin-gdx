@@ -9,12 +9,18 @@ import architecture.engine.structs.ToListen
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.my.architecture.engine.structs.GameObject
 
-class Spawn (val positionToSpawn: Float, val enemies: Array<BasicEnemy>, val timeBetweenSpawns: Float, val offsetPlayerX: Float): GameObject(arrayOf(), 0.0f, 0.0f) {
+class Spawn (
+        val positionToSpawn: Float,
+        val enemies: Array<BasicEnemy>,
+        val timeBetweenSpawns: Float,
+        val offsetPlayerX: Float
+): GameObject(arrayOf(), 0.0f, 0.0f) {
     var time = timeBetweenSpawns
     var currentEnemy = 0
 
@@ -60,46 +66,6 @@ class Spawn (val positionToSpawn: Float, val enemies: Array<BasicEnemy>, val tim
  * @NOTE THIS class should be the last thing to be initialized.
  */
 class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
-
-    val enemiesToSpawn: MutableList<Spawn> = mutableListOf(
-            Spawn(
-                    1500.0f,
-                    Config.randomConfig(10),
-                    2.2f,
-                    -200f
-            ),
-            Spawn(
-                    1800.0f,
-                    Config.randomConfig(10),
-                    4.2f,
-                    200f
-            ),
-            Spawn(
-                    2000.0f,
-                    Config.randomConfig(20),
-                    2.2f,
-                    -200f
-            ),
-            Spawn(
-                    2300.0f,
-                    Config.randomConfig(20),
-                    2.2f,
-                    400f
-            ),
-            Spawn(
-                    2800.0f,
-                    Config.randomConfig(20),
-                    2.2f,
-                    400f
-            ),
-            Spawn(
-                    3000.0f,
-                    Config.randomConfig(20),
-                    2.2f,
-                    -200f
-            )
-    )
-
     var topBounds: Float = 0.0f
     var bottomBounds: Float = 0.0f
     var rightBounds: Float = 0.0f
@@ -122,14 +88,48 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
             return position.y + height < LevelManager.level.bottomBounds || position.y > LevelManager.level.topBounds
                     || position.x > LevelManager.level.rightBounds || position.x + width < LevelManager.level.leftBounds
         }
+
+        fun addPlayer() {
+            val camera = Game.renderer.addCamera()
+            val pos = camera.position
+            pos.x = Game.camera.position.x
+            pos.y = Game.camera.position.y
+            pos.z = Game.camera.position.z
+
+            val joystick01 = World.world.instantiate(PhysicalJoystick(
+                    ToListen.NONE,
+                    arrayOf(Input.Keys.H, Input.Keys.F, Input.Keys.T, Input.Keys.G),
+                    2.5f
+            ))
+            val joystick02 = World.world.instantiate(PhysicalJoystick(
+                    ToListen.NONE,
+                    arrayOf(Input.Keys.L, Input.Keys.J, Input.Keys.I, Input.Keys.K),
+                    2.5f
+            ))
+            val joystick03 = World.world.instantiate(PhysicalJoystick(
+                    ToListen.NONE,
+                    arrayOf(Input.Keys.Y, -1, Input.Keys.Y, -1),
+                    2.5f
+            ))
+            val player = World.world.instantiate(Player(
+                    SpaceInvaders.sprites.slice(0..2).toTypedArray(),
+                    joystick01,
+                    joystick02,
+                    joystick03
+            ))
+            player.position.x = camera.position.x
+            player.position.y = camera.position.y
+            player.tint = Color.PURPLE
+        }
     }
 
     override fun update(dt: Float) {
         cameraWork(dt)
-        spawner()
+//        spawner()
     }
 
     override fun start() {
+        // We add this texture for the particles of the enemies
         players = World.world.findGameObjects()
         camera = Game.camera
         for ((i, camera) in Game.renderer.cameras.withIndex()) {
@@ -141,14 +141,14 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
         level = this
     }
 
-    private fun spawner() {
-        if (currentSpawner >= enemiesToSpawn.size) return
-//        Gdx.app.log("SPAWNER", "${camera.position.y + camera.viewportHeight / 2}")
-        if (camera.position.y + camera.viewportHeight / 2 >= enemiesToSpawn[currentSpawner].positionToSpawn) {
-            World.world.instantiate(enemiesToSpawn[currentSpawner])
-            currentSpawner++
-        }
-    }
+//    private fun spawner() {
+//        if (currentSpawner >= enemiesToSpawn.size) return
+////        Gdx.app.log("SPAWNER", "${camera.position.y + camera.viewportHeight / 2}")
+//        if (camera.position.y + camera.viewportHeight / 2 >= enemiesToSpawn[currentSpawner].positionToSpawn) {
+//            World.world.instantiate(enemiesToSpawn[currentSpawner])
+//            currentSpawner++
+//        }
+//    }
 
     var cameraSpeed = 20.0f
 
@@ -167,32 +167,6 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
         }
     }
 
-    fun addPlayer() {
-        val camera = Game.renderer.addCamera()
-        val pos = camera.position
-        pos.x = Game.camera.position.x
-        pos.y = Game.camera.position.y
-        pos.z = Game.camera.position.z
 
-        val joystick01 = World.world.instantiate(PhysicalJoystick(
-                ToListen.NONE,
-                arrayOf(Input.Keys.H, Input.Keys.F, Input.Keys.T, Input.Keys.G),
-                2.5f
-        ))
-        val joystick02 = World.world.instantiate(PhysicalJoystick(
-                ToListen.NONE,
-                arrayOf(Input.Keys.L, Input.Keys.J, Input.Keys.I, Input.Keys.K),
-                2.5f
-        ))
-        val joystick03 = World.world.instantiate(PhysicalJoystick(
-                ToListen.NONE,
-                arrayOf(Input.Keys.Y, -1, Input.Keys.Y, -1),
-                2.5f
-        ))
-        val player = World.world.instantiate(Player(SpaceInvaders.sprites.slice(0..2).toTypedArray(), joystick01, joystick02, joystick03))
-        player.position.x = camera.position.x
-        player.position.y = camera.position.y
-        player.tint = Color.PURPLE
-    }
 
 }

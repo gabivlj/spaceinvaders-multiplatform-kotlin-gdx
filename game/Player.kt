@@ -1,15 +1,16 @@
 package architecture.game
 
-import architecture.engine.Audio
-import architecture.engine.AudioID
-import architecture.engine.AudioType
-import architecture.engine.World
+import architecture.engine.*
 import architecture.engine.structs.GameObjectInput
 import architecture.engine.structs.IJoystick
 import architecture.engine.structs.PhysicalJoystick
 import architecture.engine.structs.ToListen
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
@@ -48,16 +49,37 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     override fun keyDown(keycode: Int): Boolean {
         return true
     }
-
+    var effect: ParticleEffect? = null
+    var trail: ParticleEffect? = null
     override fun start() {
+        Game.renderer.particleAtlas = TextureAtlas()
+        Game.renderer.particleAtlas.addRegion("star-real", Texture("star-real.png"), 0, 0, 400, 300)
+        Game.renderer.particleAtlas.addRegion("rect", Texture("rect.png"), 0, 0, 400, 400)
+        effect = ParticleEffect()
+        trail = ParticleEffect()
+        effect?.load(Gdx.files.internal("particle.p"), Game.renderer.particleAtlas)
+        trail?.load(Gdx.files.internal("trail.p"), Game.renderer.particleAtlas)
+        effect?.start()
+        trail?.start()
+        Game.renderer.effects.add(effect!!)
+        Game.renderer.effects.add(trail!!)
         super.start()
-        tint = Config.colorOfShip
+        if (tint == Color.WHITE)
+            tint = Config.colorOfShip
         specialAttackJoy.subscribe(this)
+        effect?.scaleEffect(1.5f, 1.5f, 2f)
         audioShoot = Audio.add("shoot.mp3", AudioType.TRACK)
         activateCollisions()
     }
 
     override fun update(dt: Float) {
+        effect?.setPosition(position.x, position.y)
+        effect?.setDuration(1000)
+        trail?.setPosition(position.x, position.y)
+        if (effect?.isComplete!!) {
+            effect?.reset()
+        }
+
         if (hp <= 0f) {
             SpaceInvaders.worlds[1].start()
             return
@@ -105,6 +127,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             val bullet = NormalBullet(
                     Vector2(),
                     dir,
+                    this,
                     { accumulatorSpecialAttack += 10f },
                     SpaceInvaders.sprites.slice(currentShot.spritesBullet).toTypedArray(),
                     currentShot.damage,
@@ -143,7 +166,11 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             return
         }
         accumulatorSpecialAttack = 0.0f
-        World.world.instantiate(SpecialBullet(position.cpy(), movementJoystick.dir()){ accumulatorSpecialAttack += 10f })
+        World.world.instantiate(SpecialBullet(
+                position.cpy(),
+                this,
+                movementJoystick.dir()
+        ){ accumulatorSpecialAttack += 10f })
     }
 
     /**
@@ -155,11 +182,16 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             return
         }
         accumulatorSpecialAttack = 0.0f
-        World.world.instantiate(SpecialBullet(position.cpy(), direction){ accumulatorSpecialAttack += 10f })
+        World.world.instantiate(SpecialBullet(
+                position.cpy(),
+                this,
+                direction
+        ){ accumulatorSpecialAttack += 10f })
     }
 
     override fun onDispose() {
         specialAttackJoy.unsubscribe(this)
+        Game.renderer.effects.remove(effect)
     }
 
     override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {

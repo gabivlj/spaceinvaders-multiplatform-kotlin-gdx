@@ -10,6 +10,7 @@ import com.my.architecture.engine.structs.GameObject
 import java.util.logging.Level
 
 open class Bullet(pos: Vector2,
+                  private var parent: Player? = null,
                   private val dir: Vector2,
                   private val onHit: () -> (Unit),
                   sprites: Array<Sprite>,
@@ -48,7 +49,10 @@ open class Bullet(pos: Vector2,
                             it.setVolume(id, .24f)
                         }
                     }
-                    other.player.score += 125f
+                    if (parent != null) {
+                        parent!!.score += Config.sumScore
+                    }
+
                 }
                 onHit()
                 World.world.destroy(this)

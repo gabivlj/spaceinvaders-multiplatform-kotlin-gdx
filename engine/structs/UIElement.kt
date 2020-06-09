@@ -21,7 +21,7 @@ fun V3V2(v: Vector3): Vector2 {
  */
 open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosition: Vector2) : GameObjectInput(sprites, w, h, initialPosition) {
     private var posCamera = Vector3()
-
+    var useScreenCoords = true
     private val subscribers = mutableListOf<GameObjectInput>()
 
 
@@ -34,14 +34,16 @@ open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosi
 
     override fun start() {
         super.start()
-        position = V3V2(Game.camera.unproject(V2V3(initialPosition)))
-        posCamera = Game.camera.position.cpy()
+        if (useScreenCoords) {
+            position = V3V2(Game.camera.unproject(V2V3(initialPosition)))
+            posCamera = Game.camera.position.cpy()
+        }
         depth = Renderer.MAX_DEPTH
     }
 
     override fun update(dt: Float) {
         // If camera moves, change UI.
-        if (posCamera.x != Game.camera.position.x || posCamera.y != Game.camera.position.y) {
+        if (useScreenCoords && (posCamera.x != Game.camera.position.x || posCamera.y != Game.camera.position.y)) {
             position = V3V2(Game.camera.unproject(V2V3(initialPosition)))
             posCamera = Game.camera.position.cpy()
         }

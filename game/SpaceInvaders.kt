@@ -52,7 +52,7 @@ class SpaceInvaders : Game() {
         Config.currentMapIdx = 0
         rendererOpt = RendererOptimizer()
         rendererBackground = RendererOptimizer()
-        spritesMenus  = rendererOpt.consumeSprites("MENU6XD")
+        spritesMenus  = rendererOpt.consumeSprites("MENU8XD")
         if (spritesMenus.isEmpty()) {
             assert(rendererOpt.sprite("easy.png"))
             assert(rendererOpt.sprite("medium.png"))
@@ -61,15 +61,15 @@ class SpaceInvaders : Game() {
             assert(rendererOpt.sprite("even-harder.png"))
             assert(rendererOpt.sprite("back.png"))
             assert(rendererOpt.sprite("start_button.png"))
-            // 7..len(maps)
+            assert(rendererOpt.sprite("playericon.png"))
+            assert(rendererOpt.sprite("icon_sound.png"))
             spritesBackground = rendererBackground.consumeSprites()
-            rendererOpt.saveConsumedSprites("MENU6XD")
+            rendererOpt.saveConsumedSprites("MENU8XD")
         }
         spritesBackground = mutableListOf()
         for ((i, map) in maps.withIndex()) {
             spritesBackground.add(Sprite(Texture(map.background)))
         }
-        Gdx.app.log("MAP SIZE", "${spritesBackground.size}")
         Renderer.fallback = { spritesMenus.slice(0..0)[0] }
         World.world.instantiate(MenuManager())
     }
@@ -77,7 +77,7 @@ class SpaceInvaders : Game() {
     private fun startForGameplayWorld() {
         rendererOpt = RendererOptimizer()
         rendererBackground = RendererOptimizer()
-        sprites = rendererOpt.consumeSprites("ASSETS_08")
+        sprites = rendererOpt.consumeSprites("ASSETS_11")
 
         if (sprites.isEmpty()) {
             // PLAYER SPRITE (0)
@@ -100,8 +100,8 @@ class SpaceInvaders : Game() {
             assert(rendererOpt.sprite("$baseURL/Enemy02_Teal_Frame_1_png_processed.png"))
 
             // Joysticks (21, 22)
-            assert(rendererOpt.sprite("joyyy.png"))
-            assert(rendererOpt.sprite("circle.png"))
+            assert(rendererOpt.sprite("joy-new.png"))
+            assert(rendererOpt.sprite("joy-better-2.png"))
 
             // Shooting Special (23)
             assert(rendererOpt.sprite("$baseURL/Explosion02_Frame_06_png_processed.png"))
@@ -132,7 +132,7 @@ class SpaceInvaders : Game() {
             // Save them
             sprites = rendererOpt.consumeSprites()
 
-            rendererOpt.saveConsumedSprites("ASSETS_08")
+            rendererOpt.saveConsumedSprites("ASSETS_11")
         }
         spritesBackground = mutableListOf()
         spritesBackground.add(Sprite(Texture(Config.currentMap.background)))
@@ -141,6 +141,7 @@ class SpaceInvaders : Game() {
     }
 
     override fun start() {
+//        Audio.muted = true
         Gdx.graphics.setResizable(false)
         World.setCurrentWorld(worlds[0])
         worlds[2].onStart =  { startForTransition() }
@@ -177,7 +178,7 @@ class SpaceInvaders : Game() {
         instantiatePlayerAndJoysticks()
         World.world.instantiate(SpawningBehaviour())
         World.world.instantiate(Enemy(Vector2(100f, 100f)))
-        World.world.instantiate(SpecialAttackBar())
+        World.world.instantiate(SpecialAttackBar(null))
         Background(spritesBackground[0])
         UIManagerInGame()
         LevelManager()
@@ -298,6 +299,11 @@ class SpaceInvaders : Game() {
             joystick03 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_FACE, arrayOf(Input.Keys.E, -1, Input.Keys.E, -1), 2.5f))
         }
 
+
         World.world.instantiate(Player(sprites.slice(0..2).toTypedArray(), joystick01, joystick02, joystick03))
+        if (Config.nPlayers > 1) {
+            LevelManager.addPlayer()
+        }
+
     }
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2
 
 class NormalBullet(pos: Vector2,
                    dir: Vector2,
+                   parent: Player,
                    onHit: () -> (Unit),
                    spritesToUse: Array<Sprite> = SpaceInvaders.sprites.slice(3..8).toTypedArray(),
                    damage: Float = 10f,
@@ -15,6 +16,7 @@ class NormalBullet(pos: Vector2,
     )
     : Bullet(
         pos,
+        parent,
         dir,
         onHit,
         spritesToUse,

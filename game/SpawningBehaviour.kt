@@ -8,11 +8,17 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType
 import com.my.architecture.engine.structs.GameObject
 
 
-class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arrayOf(), 0.0f, 0.0f, Vector2(0.0f, 0.0f)) {
+class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(
+        arrayOf(),
+        0.0f,
+        0.0f,
+        Vector2(0.0f, 0.0f)
+) {
     private var currentSpawner = -1
     private var enemiesLeft = 0
     private var currentTime = 0.0f
     private lateinit var player: Player
+    var players: com.badlogic.gdx.utils.Array<Player> = com.badlogic.gdx.utils.Array()
     var randomFn: Array<() -> BasicEnemy?> = arrayOf()
     val currentSpawnerItem: SpawnerMap
         get() { return map.spawners[currentSpawner] }
@@ -26,7 +32,7 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arr
         }
     override fun start() {
         super.start()
-        val players = World.world.findGameObjects<Player>()
+        players = World.world.findGameObjects()
         if (players.isEmpty) return
         player = players[0]
         for (spawner in map.spawners) {
@@ -60,7 +66,7 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arr
         })
     }
 
-    fun finishedAllSpawns(): Boolean {
+    private fun finishedAllSpawns(): Boolean {
         return currentSpawner >= map.spawners.size
     }
 
@@ -68,7 +74,7 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arr
      * Returns if the current spawner is finished
      * this function will always be true if you don't call nextSpawn()
      */
-    fun finishedCurrentSpawn(): Boolean {
+    private fun finishedCurrentSpawn(): Boolean {
         if (currentSpawner < 0) {
             return true
         }
@@ -76,7 +82,7 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arr
         return enemiesLeft <= 0 || currentSpawnerItem.nEnemiesFollow + currentSpawnerItem.nEnemiesNormal + currentSpawnerItem.nBosses == 0
     }
 
-    fun passToNextSpawn(): Boolean {
+    private fun canPassToNextSpawn(): Boolean {
         return enemiesLeft <= 0 || currentSpawner == -1
     }
 
@@ -95,7 +101,6 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arr
 
     private fun handleSpawn() {
         var enemyEnd: BasicEnemy? = null
-        // TODO: There might be a better algo
         while (enemyEnd == null) { enemyEnd = randomFn.random()() }
         World.world.instantiate(enemyEnd)
     }
@@ -103,13 +108,13 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(arr
     override fun update(dt: Float) {
         // This is when we finish the phase
         if (finishedAllSpawns()) {
-            Config.scoreGainedInPhase = player.score
+            Config.scoreGainedInPhase = players.sumBy { it.score.toInt() }.toFloat()
             Config.currentScore += Config.scoreGainedInPhase
             SpaceInvaders.worlds[2].start()
             return
         }
         // If we should pass to the next spawn (all the enemies are dead)
-        if (passToNextSpawn()) {
+        if (canPassToNextSpawn()) {
             nextSpawn()
             return
         }

@@ -3,15 +3,20 @@ package architecture.engine
 import architecture.engine.structs.Text
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Logger
 import com.my.architecture.engine.structs.GameObject
 
+
 class Renderer {
+    /**
+     * Texture atlas in which all of the particle effects are stored
+     */
+    var particleAtlas: TextureAtlas = TextureAtlas()
+    var effects: MutableList<ParticleEffect> = mutableListOf()
+
     private lateinit var batch: SpriteBatch
     /**
      * The main camera of the camera that this library sets up for you
@@ -142,6 +147,10 @@ class Renderer {
         textUI = mutableListOf()
         Animator.animations = mutableListOf()
         cameras = mutableListOf(camera)
+        effects.forEach { it.dispose() }
+        particleAtlas.dispose()
+        camera.viewportWidth = sizeRenderer.x
+        camera.viewportHeight = sizeRenderer.y
     }
 
     fun renderOptimized(world: World) {
@@ -155,8 +164,6 @@ class Renderer {
             renderCamera(cameraItem, nCamera, world)
         }
         batch.end()
-//        Gdx.app.log("RENDER CALLS", "${batch.renderCalls}")
-//        Gdx.app.log("FPS", "${Gdx.graphics.framesPerSecond}")
     }
 
     private fun renderCamera(cameraRender: OrthographicCamera, nCamera: Int, world: World) {
@@ -187,8 +194,11 @@ class Renderer {
         for (textInput in textInputs) {
             textInput.draw(batch, 1f)
         }
-    }
+        for (particle in effects) {
+            particle.draw(batch, 0.01f)
+        }
 
+    }
     fun start() {
         batch = SpriteBatch(8191)
         camera = OrthographicCamera()
