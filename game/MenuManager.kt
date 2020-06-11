@@ -11,11 +11,45 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
 
+/**
+ * Spawns the standard UIStack for this game
+ */
+fun spawnStack() {
+    val buttonHandle = World.world.instantiate(
+        PhysicalJoystick(
+            ToListen.LEFT_FACE,
+            arrayOf(
+                Input.Keys.E,
+                -1,
+                Input.Keys.E,
+                -1
+            ),
+            2.5f
+        )
+    )
+    val moveHandle = World.world.instantiate(
+        PhysicalJoystick(
+            ToListen.LEFT_STICK,
+            arrayOf(
+                Input.Keys.D,
+                Input.Keys.A,
+                Input.Keys.W,
+                Input.Keys.S
+            )
+        )
+    )
+    val stack = UIStack(
+        moveHandle,
+        buttonHandle
+    )
+    World.world.instantiate(stack)
+}
+
 class MenuManager : GameObject(
-        arrayOf(),
-        0f,
-        0f,
-        Vector2(0f, 0f)
+    arrayOf(),
+    0f,
+    0f,
+    Vector2(0f, 0f)
 ) {
     private val widthButtonStart = 300f
     private val heightButtonStart = 300f
@@ -33,46 +67,51 @@ class MenuManager : GameObject(
     }
 
     private fun showMenu() {
-        Game.camera.position.set(0.0f, 0.0f, 0.0f);
+        Game.camera.position.set(0.0f, 0.0f, 0.0f)
         Game.camera.update()
         val buttonStart: UIButton = UIButton(
-                SpaceInvaders.spritesMenus.slice(6..6).toTypedArray(),
-                widthButtonStart,
-                heightButtonStart,
-                Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 2f),
-                "",
-                Vector2()) {
+            SpaceInvaders.spritesMenus.slice(6..6).toTypedArray(),
+            widthButtonStart,
+            heightButtonStart,
+            Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 2f),
+            "",
+            Vector2()
+        ) {
             Audio.play(clickSound)
-//            SpaceInvaders.worlds[1].start()
             showMapsToChoose()
-        }.also { uiButton -> uiButton.onHover = {
-            it.width *= 1.1f;
-            it.height *= 1.1f
-            Audio.play(hoverSound)
-        } }
-                .also { uiButton -> uiButton.stopHover = {
-                    it.width = widthButtonStart;
-                    it.height = heightButtonStart;
-                } }
+        }.also { uiButton ->
+            uiButton.onHover = {
+                it.width *= 1.1f
+                it.height *= 1.1f
+                Audio.play(hoverSound)
+            }
+        }
+            .also { uiButton ->
+                uiButton.stopHover = {
+                    it.width = widthButtonStart
+                    it.height = heightButtonStart
+                }
+            }
 
-        World.world.instantiate(buttonStart)
+        instantiate(buttonStart)
         var pos = 100f
         val difficulties = Difficulty.values()
         for ((i, difficulty) in difficulties.withIndex()) {
             val easyButton: UIButton = UIButton(
-                    SpaceInvaders.spritesMenus.slice(difficulty.spriteRoute).toTypedArray(),
-                    widthButtonStart / difficulties.size,
-                    heightButtonStart / 4,
-                    Vector2(),
-                    "",
-                    Vector2()) {
+                SpaceInvaders.spritesMenus.slice(difficulty.spriteRoute).toTypedArray(),
+                widthButtonStart / difficulties.size,
+                heightButtonStart / 4,
+                Vector2(),
+                "",
+                Vector2()
+            ) {
                 Config.difficulty = difficulty
                 Audio.play(clickSound)
             }.also { b ->
                 b.useScreenCoords = false
                 b.position = Vector2(
-                        ((widthButtonStart + Gdx.graphics.width / difficulties.size) / difficulties.size * i) - 150,
-                        -50f
+                    ((widthButtonStart + Gdx.graphics.width / difficulties.size) / difficulties.size * i) - 150,
+                    -50f
                 )
                 b.onHover = {
                     it.textUI.width = 2f
@@ -87,171 +126,143 @@ class MenuManager : GameObject(
             World.world.instantiate(easyButton)
             pos += 300f
         }
-
-        val buttonHandle = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_FACE, arrayOf(
-                Input.Keys.E,
-                -1,
-                Input.Keys.E,
-                -1
-        ), 2.5f))
-        val moveHandle = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_STICK, arrayOf(
-                Input.Keys.D,
-                Input.Keys.A,
-                Input.Keys.W,
-                Input.Keys.S
-        )))
-        val stack = UIStack(
-                moveHandle,
-                buttonHandle
-        )
-        World.world.instantiate(stack)
+        spawnStack()
     }
 
-   private fun showMapsToChoose() {
-       Game.camera.position.set(Gdx.app.graphics.width / 2f, 0.0f, 0.0f);
-       Game.camera.update()
+    private fun showMapsToChoose() {
+        Game.camera.position.set(Gdx.app.graphics.width / 2f, 0.0f, 0.0f)
+        Game.camera.update()
         World.world.findGameObjects<GameObject>().forEach {
             World.world.destroy(it)
         }
-       val buttonHandle = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_FACE, arrayOf(
-               Input.Keys.E,
-               -1,
-               Input.Keys.E,
-               -1
-       ), 2.5f))
-       val moveHandle = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_STICK, arrayOf(
-               Input.Keys.D,
-               Input.Keys.A,
-               Input.Keys.W,
-               Input.Keys.S
-       )))
-       val stack = UIStack(
-               moveHandle,
-               buttonHandle
-       )
-       World.world.instantiate(stack)
-       val sprite = SpaceInvaders.spritesBackground
+        spawnStack()
+        val sprite = SpaceInvaders.spritesBackground
         for ((idx, _) in sprite.withIndex()) {
-            World.world.instantiate(UIButton(
+            World.world.instantiate(
+                UIButton(
                     arrayOf(sprite[idx]),
                     Gdx.app.graphics.width / sprite.size.toFloat(),
                     Gdx.app.graphics.width / sprite.size.toFloat(),
                     Vector2(),
                     "${idx + 1}. ${Config.maps[idx].name}",
                     Vector2()
-            ) {
-                Config.currentMapIdx = idx
-                SpaceInvaders.worlds[1].start()
-            }.also { it.useScreenCoords = false; it.position = Vector2(
-                    (Gdx.graphics.width / sprite.size.toFloat()) * idx,
-                    0f
+                ) {
+                    Config.currentMapIdx = idx
+                    SpaceInvaders.worlds[1].start()
+                }.also {
+                    it.useScreenCoords = false; it.position = Vector2(
+                        (Gdx.graphics.width / sprite.size.toFloat()) * idx,
+                        0f
+                    )
+                    it.onHover = {
+                        it.text = "${idx + 1} ${Config.maps[idx].name} (SELECTED)"
+                    }
+                    it.stopHover = {
+                        it.text = "${idx + 1} ${Config.maps[idx].name}"
+                    }
+                }
             )
-                it.onHover = {
-                    it.text = "${idx + 1} ${Config.maps[idx].name} (SELECTED)"
-                }
-                it.stopHover = {
-                    it.text = "${idx + 1} ${Config.maps[idx].name}"
-                }
-            })
         }
 
-
-       val buttonStart: UIButton = UIButton(
-               SpaceInvaders.spritesMenus.slice(5..5).toTypedArray(),
-               widthButtonStart / 2f,
-               heightButtonStart / 2f,
-               Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 1.2f),
-               "Choose the color of your ship! (In Hexadecimal)",
-               Vector2()) {
-           Audio.play(clickSound)
-           showColorPrompt()
-       }.also { uiButton ->
+        val buttonStart: UIButton = UIButton(
+            SpaceInvaders.spritesMenus.slice(5..5).toTypedArray(),
+            widthButtonStart / 2f,
+            heightButtonStart / 2f,
+            Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 1.2f),
+            "Choose the color of your ship! (In Hexadecimal)",
+            Vector2()
+        ) {
+            Audio.play(clickSound)
+            showColorPrompt()
+        }.also { uiButton ->
             uiButton.onHover = {
-               it.position.y += 10f
-               Audio.play(hoverSound)
+                it.position.y += 10f
+                Audio.play(hoverSound)
             }
-       }
-       .also { uiButton -> uiButton.stopHover = {
-           it.position.y -= 10f
         }
-           uiButton.useScreenCoords = false
-           uiButton.position = Vector2(Gdx.graphics.width / 2f - widthButtonStart, -Gdx.graphics.height / 2f + 40f)
-       }
-
-       World.world.instantiate(buttonStart)
-
-       val buttonSound: UIButton = UIButton(
-               SpaceInvaders.spritesMenus.slice(8..8).toTypedArray(),
-               widthButtonStart / 2f,
-               heightButtonStart / 2f,
-               Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 1.2f),
-               "",
-               Vector2()) {
-           Audio.play(clickSound)
-           Audio.muted = !Audio.muted
-       }.also { uiButton ->
-           uiButton.onHover = {
-               Audio.play(hoverSound)
-               if (Audio.muted) {
-                   it.text = "Unmute the audio!"
-               } else {
-                   it.text = "Mute the audio!"
-               }
-           }
-           uiButton.stopHover = {
-               it.text = ""
-           }
-       }
-       .also { uiButton ->
-           uiButton.useScreenCoords = false
-           uiButton.position = Vector2(Gdx.graphics.width / 2f, -Gdx.graphics.height / 2f + 40f)
-           uiButton.textUI.position = uiButton.position.cpy().add(0.0f, 10.0f)
-       }
-       World.world.instantiate(buttonSound)
-       val buttonPlayers: UIButton = UIButton(
-               SpaceInvaders.spritesMenus.slice(7..7).toTypedArray(),
-               widthButtonStart / 2f,
-               heightButtonStart / 2f,
-               Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 1.2f),
-               "",
-               Vector2()) {
-           Audio.play(clickSound)
-           Config.nPlayers = if (Config.nPlayers == 1) 2 else { 1 }
-       }.also { uiButton ->
-           uiButton.onHover = {
-               Audio.play(hoverSound)
-               if (Config.nPlayers == 2) {
-                   it.text = "Play as 1!"
-               } else {
-                   it.text = "Play as 2"
-               }
-           }
-           uiButton.stopHover = {
-               it.text = ""
-           }
-       }
-       .also { uiButton ->
-           uiButton.useScreenCoords = false
-           uiButton.position = Vector2(Gdx.graphics.width / 2f + widthButtonStart + 10 / 2f, -Gdx.graphics.height / 2f + 40f)
-       }
-       World.world.instantiate(buttonPlayers)
-   }
-
-
-    private fun showColorPrompt() {
-        Gdx.input.getTextInput(object : Input.TextInputListener {
-            override fun input(text: String?) {
-                if (text == null) return
-                Config.colorOfShip = valueOf(text)
+            .also { uiButton ->
+                uiButton.stopHover = {
+                    it.position.y -= 10f
+                }
+                uiButton.useScreenCoords = false
+                uiButton.position = Vector2(Gdx.graphics.width / 2f - widthButtonStart, -Gdx.graphics.height / 2f + 40f)
             }
 
-            override fun canceled() {
+        World.world.instantiate(buttonStart)
 
+        val buttonSound: UIButton = UIButton(
+            SpaceInvaders.spritesMenus.slice(8..8).toTypedArray(),
+            widthButtonStart / 2f,
+            heightButtonStart / 2f,
+            Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 1.2f),
+            "",
+            Vector2()
+        ) {
+            Audio.play(clickSound)
+            Audio.muted = !Audio.muted
+        }.also { uiButton ->
+            uiButton.onHover = {
+                Audio.play(hoverSound)
+                if (Audio.muted) {
+                    it.text = "Unmute the audio!"
+                } else {
+                    it.text = "Mute the audio!"
+                }
             }
-        }, "Insert a custom color for your ship", "In Hex! (Cancel for default)", "")
-
+            uiButton.stopHover = {
+                it.text = ""
+            }
+        }
+            .also { uiButton ->
+                uiButton.useScreenCoords = false
+                uiButton.position = Vector2(Gdx.graphics.width / 2f, -Gdx.graphics.height / 2f + 40f)
+                uiButton.textUI.position = uiButton.position.cpy().add(0.0f, 10.0f)
+            }
+        instantiate(buttonSound)
+        val buttonPlayers: UIButton = UIButton(
+            SpaceInvaders.spritesMenus.slice(7..7).toTypedArray(),
+            widthButtonStart / 2f,
+            heightButtonStart / 2f,
+            Vector2((Gdx.graphics.width / 2f) - (widthButtonStart / 4), Gdx.graphics.height / 1.2f),
+            "",
+            Vector2()
+        ) {
+            Audio.play(clickSound)
+            Config.nPlayers = if (Config.nPlayers == 1) 2 else { 1 }
+        }.also { uiButton ->
+            uiButton.onHover = {
+                Audio.play(hoverSound)
+                if (Config.nPlayers == 2) {
+                    it.text = "Play as 1!"
+                } else {
+                    it.text = "Play as 2"
+                }
+            }
+            uiButton.stopHover = {
+                it.text = ""
+            }
+        }
+            .also { uiButton ->
+                uiButton.useScreenCoords = false
+                uiButton.position = Vector2(Gdx.graphics.width / 2f + widthButtonStart + 10 / 2f, -Gdx.graphics.height / 2f + 40f)
+            }
+        World.world.instantiate(buttonPlayers)
     }
 
+    private fun showColorPrompt() {
+        Gdx.input.getTextInput(
+            object : Input.TextInputListener {
+                override fun input(text: String?) {
+                    if (text == null) return
+                    Config.colorOfShip = valueOf(text)
+                }
+
+                override fun canceled() {
+                }
+            },
+            "Insert a custom color for your ship", "In Hex! (Cancel for default)", ""
+        )
+    }
 }
 
 fun valueOf(hexInput: String): Color {

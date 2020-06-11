@@ -24,8 +24,8 @@ import kotlin.math.sign
  * @see IJoystick
  */
 class UIStack(
-        private val moveJoystick: IJoystick,
-        private val clickJoystick: IJoystick
+    private val moveJoystick: IJoystick,
+    private val clickJoystick: IJoystick
 ) : GameObject() {
 
     private var buttons: Array<UIButton> = Array()
@@ -34,7 +34,7 @@ class UIStack(
     private val timer: Float = 0.5f
 
     override fun start() {
-        buttons = World.world.findGameObjects()
+        buttons = findGameObjects()
     }
 
     override fun update(dt: Float) {

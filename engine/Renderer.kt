@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Logger
 import com.my.architecture.engine.structs.GameObject
 
-
 class Renderer {
     /**
      * Texture atlas in which all of the particle effects are stored
@@ -49,7 +48,6 @@ class Renderer {
          */
         var sizeRenderer: Vector2 = Vector2(1921.0f, 1080.0f)
 
-
         var viewport: Vector2
             get() {
                 return sizeRenderer
@@ -60,7 +58,6 @@ class Renderer {
                 Game.camera.viewportWidth = sizeRenderer.x
                 Game.camera.update()
             }
-
 
         /**
          * Returns the specified sprite depending on the texture path. If it doesn't exist in the RAM storage it stores it.
@@ -87,15 +84,14 @@ class Renderer {
         }
     }
 
-
     /**
      * @deprecated
      */
     fun render(world: World) {
         times++
         var beg = System.nanoTime()
-        Gdx.gl.glClearColor(0f, 1.0f, 1.0f, 1.0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClearColor(0f, 1.0f, 1.0f, 1.0f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         if (camera.viewportHeight != sizeRenderer.y) {
             camera.viewportHeight = sizeRenderer.y
         }
@@ -123,11 +119,11 @@ class Renderer {
                 spr.rotation = gameObject.rotation
                 spr.setBounds(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height)
                 spr.setPosition(
-                        if (gameObject.flipX)
-                            gameObject.position.x + gameObject.width
-                        else
-                            gameObject.position.x,
-                        gameObject.position.y
+                    if (gameObject.flipX)
+                        gameObject.position.x + gameObject.width
+                    else
+                        gameObject.position.x,
+                    gameObject.position.y
                 )
                 spr.setScale(if (gameObject.flipX) -1.0f else 1.0f, 1.0f)
                 spr.draw(batch)
@@ -154,25 +150,26 @@ class Renderer {
     }
 
     fun renderOptimized(world: World) {
-        Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         Animator.animations.forEach { it.update() }
         batch.begin()
         for ((nCamera, cameraItem) in cameras.withIndex()) {
             renderCamera(cameraItem, nCamera, world)
         }
         batch.end()
+        Gdx.app.log("FPS", "${Gdx.graphics.framesPerSecond}")
     }
 
     private fun renderCamera(cameraRender: OrthographicCamera, nCamera: Int, world: World) {
         batch.projectionMatrix = cameraRender.combined
         Gdx.gl.glViewport(
-                nCamera * Gdx.graphics.width / cameras.size,
-                0,
-                Gdx.graphics.width / cameras.size,
-                Gdx.graphics.height
+            nCamera * Gdx.graphics.width / cameras.size,
+            0,
+            Gdx.graphics.width / cameras.size,
+            Gdx.graphics.height
         )
 
         for (gameObject in world.gameObjects) {
@@ -197,7 +194,6 @@ class Renderer {
         for (particle in effects) {
             particle.draw(batch, 0.01f)
         }
-
     }
     fun start() {
         batch = SpriteBatch(8191)
@@ -223,5 +219,4 @@ class Renderer {
         }
         return cameraToAdd
     }
-
 }

@@ -3,7 +3,6 @@ package architecture.game
 import architecture.engine.World
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Array
 import com.my.architecture.engine.structs.GameObject
@@ -23,7 +22,6 @@ class SpecialAttackBar(var secondPlayer: Player?) : GameObject(arrayOf(), 0.0f, 
         val joys = World.world.findGameObjects<Joy>().filter { joy -> joy.tag == "JOYSTICK ATTACK" }
         if (joys.isNotEmpty()) joy = joys[0]
         shape = ShapeRenderer()
-
     }
 
     override fun update(dt: Float) {
@@ -49,7 +47,6 @@ class SpecialAttackBar(var secondPlayer: Player?) : GameObject(arrayOf(), 0.0f, 
     }
 
     override fun onDestroy() {
-
     }
 
     override fun onDispose() {
@@ -58,5 +55,4 @@ class SpecialAttackBar(var secondPlayer: Player?) : GameObject(arrayOf(), 0.0f, 
             shape = null
         }
     }
-
 }

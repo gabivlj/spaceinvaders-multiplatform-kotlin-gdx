@@ -2,11 +2,9 @@ package architecture.engine.structs
 
 import architecture.engine.Input
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.PovDirection
 import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.input.GestureDetector
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.my.architecture.engine.structs.GameObject
@@ -102,7 +100,7 @@ open class GameObjectInput(spritesSet: Array<Sprite> = arrayOf(), w: Float = 500
     }
 
     open fun connected(controller: Controller?) {
-        //To change body of created functions use File | Settings | File Templates.
+        // To change body of created functions use File | Settings | File Templates.
     }
 
     open fun buttonUp(controller: Controller?, buttonCode: Int): Boolean {
@@ -122,7 +120,6 @@ open class GameObjectInput(spritesSet: Array<Sprite> = arrayOf(), w: Float = 500
     }
 
     open fun disconnected(controller: Controller?) {
-
     }
 
     open fun xSliderMoved(controller: Controller?, sliderCode: Int, value: Boolean): Boolean {

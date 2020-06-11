@@ -5,7 +5,6 @@ import architecture.engine.structs.IJoystick
 import architecture.engine.structs.PhysicalJoystick
 import architecture.engine.structs.ToListen
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -18,7 +17,6 @@ fun assert(good: Boolean) {
 }
 
 class SpaceInvaders : Game() {
-
 
     companion object {
         val worlds: Array<World> = arrayOf(World(), World(), World())
@@ -34,7 +32,7 @@ class SpaceInvaders : Game() {
 
     private fun startForTransition() {
         rendererBackground = RendererOptimizer()
-        spritesMenus  = rendererBackground.consumeSprites("transition")
+        spritesMenus = rendererBackground.consumeSprites("transition")
         if (spritesMenus.isEmpty()) {
             assert(rendererBackground.sprite("assets/back.png"))
             assert(rendererBackground.sprite("assets/button-plus.png"))
@@ -52,7 +50,7 @@ class SpaceInvaders : Game() {
         Config.currentMapIdx = 0
         rendererOpt = RendererOptimizer()
         rendererBackground = RendererOptimizer()
-        spritesMenus  = rendererOpt.consumeSprites("MENU8XD")
+        spritesMenus = rendererOpt.consumeSprites("MENU8XD")
         if (spritesMenus.isEmpty()) {
             assert(rendererOpt.sprite("easy.png"))
             assert(rendererOpt.sprite("medium.png"))
@@ -144,14 +142,14 @@ class SpaceInvaders : Game() {
 //        Audio.muted = true
         Gdx.graphics.setResizable(false)
         World.setCurrentWorld(worlds[0])
-        worlds[2].onStart =  { startForTransition() }
+        worlds[2].onStart = { startForTransition() }
         worlds[2].onFinish = {
             spritesMenus.forEach { it.texture.dispose() }
             spritesMenus = mutableListOf()
             rendererBackground.dispose()
         }
         // Set the onStart of this world
-        worlds[1].onStart =  { startForGameplayWorld() }
+        worlds[1].onStart = { startForGameplayWorld() }
         worlds[1].onFinish = {
             sprites.forEach { it.texture.dispose() }
             spritesBackground.forEach { it.texture.dispose() }
@@ -160,7 +158,7 @@ class SpaceInvaders : Game() {
             rendererOpt.dispose()
         }
 
-        worlds[0].onStart =  { startForMenuWorld() }
+        worlds[0].onStart = { startForMenuWorld() }
         worlds[0].onFinish = {
             spritesMenus.forEach { it.texture.dispose() }
             spritesMenus = mutableListOf()
@@ -199,93 +197,96 @@ class SpaceInvaders : Game() {
          * TODO: Delete keyboard code because we already handle that inside JoystickPhysical
          */
         val joy = Joy(
-                sprite0,
-                sprite1,
-                200f,
-                50f,
-                0.0f,
-                Pair(0, Gdx.graphics.width / 3),
-                Vector2(
-                        diff.toFloat(),
-                        Gdx.graphics.height - Gdx.graphics.height / 10f
-                ),
-                /**
-                 * SUPER OMEGA DEPRECATED.
-                 * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
-                 */
-                // dir() function
-                {
-                    val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0
-                    val y = if (Gdx.input.isKeyPressed(Input.Keys.W)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.S)) -1 else 0
-                    Vector2(x.toFloat(), y.toFloat()).nor()
-                },
-                // dist() function
-                {
-                    val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0
-                    val y = if (Gdx.input.isKeyPressed(Input.Keys.W)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.S)) -1 else 0
-                    if (abs(x) > 0 || abs(y) > 0) it.maximumValueOnDistCall else 0.0f
-                }
+            sprite0,
+            sprite1,
+            200f,
+            50f,
+            0.0f,
+            Pair(0, Gdx.graphics.width / 3),
+            Vector2(
+                diff.toFloat(),
+                Gdx.graphics.height - Gdx.graphics.height / 10f
+            ),
+            /**
+             * SUPER OMEGA DEPRECATED.
+             * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
+             */
+            // dir() function
+            {
+                val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0
+                val y = if (Gdx.input.isKeyPressed(Input.Keys.W)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.S)) -1 else 0
+                Vector2(x.toFloat(), y.toFloat()).nor()
+            },
+            // dist() function
+            {
+                val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0
+                val y = if (Gdx.input.isKeyPressed(Input.Keys.W)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.S)) -1 else 0
+                if (abs(x) > 0 || abs(y) > 0) it.maximumValueOnDistCall else 0.0f
+            }
         )
         val joy2 = Joy(
-                sprite0,
-                sprite1,
-                200f,
-                50f,
-                0.0f,
-                Pair((Gdx.graphics.width * 2 + 1) / 3, Gdx.graphics.width),
-                Vector2(
-                        (Gdx.graphics.width * 2f / 3f) + diff,
-                        Gdx.graphics.height - Gdx.graphics.height / 10f
-                ),
-                /**
-                 * SUPER OMEGA DEPRECATED.
-                 * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
-                 */
-                // dir()
-                {
-                    val x = if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) -1 else 0
-                    val y = if (Gdx.input.isKeyPressed(Input.Keys.UP)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) -1 else 0
-                    Vector2(x.toFloat(), y.toFloat()).nor()
-                },
-                // dist()
-                {
-                    val x = if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) -1 else 0
-                    val y = if (Gdx.input.isKeyPressed(Input.Keys.UP)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) -1 else 0
-                    if (abs(x) > 0 || abs(y) > 0) it.maximumValueOnDistCall else 0.0f
-                }
+            sprite0,
+            sprite1,
+            200f,
+            50f,
+            0.0f,
+            Pair((Gdx.graphics.width * 2 + 1) / 3, Gdx.graphics.width),
+            Vector2(
+                (Gdx.graphics.width * 2f / 3f) + diff,
+                Gdx.graphics.height - Gdx.graphics.height / 10f
+            ),
+            /**
+             * SUPER OMEGA DEPRECATED.
+             * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
+             */
+            // dir()
+            {
+                val x = if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) -1 else 0
+                val y = if (Gdx.input.isKeyPressed(Input.Keys.UP)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) -1 else 0
+                Vector2(x.toFloat(), y.toFloat()).nor()
+            },
+            // dist()
+            {
+                val x = if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) -1 else 0
+                val y = if (Gdx.input.isKeyPressed(Input.Keys.UP)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) -1 else 0
+                if (abs(x) > 0 || abs(y) > 0) it.maximumValueOnDistCall else 0.0f
+            }
         )
 
         val joy3AttackSpecial = Joy(
-                sprite0,
-                sprite1,
-                100f,
-                25f,
-                0.0f,
-                Pair((Gdx.graphics.width + 1) / 3, Gdx.graphics.width * 2 / 3),
-                Vector2((Gdx.graphics.width / 3f) + diff,
-                        Gdx.graphics.height - Gdx.graphics.height / 10f),
-                // dir() *** we dont use this callback ***
-                {
-                    Vector2()
-                },
-                /**
-                 * We use this for non mobile platforms
-                 * When joy3AttackSpecial.dist() is called, this will be fired! (Only when not mobile)
-                 *
-                 * .dist() is called inside Player for getting inputs
-                 */
-                /**
-                 * SUPER OMEGA DEPRECATED.
-                 * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
-                 */
-                {
-                    val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0
-                    val y = if (Gdx.input.isKeyPressed(Input.Keys.W)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.S)) -1 else 0
-                    // call subscribers manually
-                    it.callSubscribers(Vector2(x.toFloat(), y.toFloat()).nor(), if (Gdx.input.isKeyPressed(Input.Keys.E)) it.maximumValueOnDistCall else 0.0f)
-                    0.0f
-                },
-                "JOYSTICK ATTACK")
+            sprite0,
+            sprite1,
+            100f,
+            25f,
+            0.0f,
+            Pair((Gdx.graphics.width + 1) / 3, Gdx.graphics.width * 2 / 3),
+            Vector2(
+                (Gdx.graphics.width / 3f) + diff,
+                Gdx.graphics.height - Gdx.graphics.height / 10f
+            ),
+            // dir() *** we dont use this callback ***
+            {
+                Vector2()
+            },
+            /**
+             * We use this for non mobile platforms
+             * When joy3AttackSpecial.dist() is called, this will be fired! (Only when not mobile)
+             *
+             * .dist() is called inside Player for getting inputs
+             */
+            /**
+             * SUPER OMEGA DEPRECATED.
+             * THIS CODE STAYS BECAUSE I WANT EVERYONE TO SEE HOW DESPICABLE I AM
+             */
+            {
+                val x = if (Gdx.input.isKeyPressed(Input.Keys.D)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.A)) -1 else 0
+                val y = if (Gdx.input.isKeyPressed(Input.Keys.W)) 1 else if (Gdx.input.isKeyPressed(Input.Keys.S)) -1 else 0
+                // call subscribers manually
+                it.callSubscribers(Vector2(x.toFloat(), y.toFloat()).nor(), if (Gdx.input.isKeyPressed(Input.Keys.E)) it.maximumValueOnDistCall else 0.0f)
+                0.0f
+            },
+            "JOYSTICK ATTACK"
+        )
         lateinit var joystick01: IJoystick
         lateinit var joystick02: IJoystick
         lateinit var joystick03: IJoystick
@@ -299,11 +300,9 @@ class SpaceInvaders : Game() {
             joystick03 = World.world.instantiate(PhysicalJoystick(ToListen.LEFT_FACE, arrayOf(Input.Keys.E, -1, Input.Keys.E, -1), 2.5f))
         }
 
-
         World.world.instantiate(Player(sprites.slice(0..2).toTypedArray(), joystick01, joystick02, joystick03))
         if (Config.nPlayers > 1) {
             LevelManager.addPlayer()
         }
-
     }
 }

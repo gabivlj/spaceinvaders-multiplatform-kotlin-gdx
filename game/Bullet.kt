@@ -2,23 +2,23 @@ package architecture.game
 
 import architecture.engine.Audio
 import architecture.engine.World
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
-import java.util.logging.Level
 
-open class Bullet(pos: Vector2,
-                  private var parent: Player? = null,
-                  private val dir: Vector2,
-                  private val onHit: () -> (Unit),
-                  sprites: Array<Sprite>,
-                  private val speed: Float,
-                  private val damage: Float,
-                  w: Float = 50f,
-                  h: Float = 75f)
-    : GameObject(sprites, w, h, pos.cpy()) {
+open class Bullet(
+    pos: Vector2,
+    private var parent: Player? = null,
+    private val dir: Vector2,
+    private val onHit: () -> (Unit),
+    sprites: Array<Sprite>,
+    private val speed: Float,
+    private val damage: Float,
+    w: Float = 50f,
+    h: Float = 75f
+) :
+    GameObject(sprites, w, h, pos.cpy()) {
 
     override fun start() {
         activateCollisions()
@@ -52,12 +52,10 @@ open class Bullet(pos: Vector2,
                     if (parent != null) {
                         parent!!.score += Config.sumScore
                     }
-
                 }
                 onHit()
                 World.world.destroy(this)
             }
         }
-
     }
 }

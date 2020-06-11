@@ -6,15 +6,16 @@ import architecture.engine.World
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 
-class NormalBullet(pos: Vector2,
-                   dir: Vector2,
-                   parent: Player,
-                   onHit: () -> (Unit),
-                   spritesToUse: Array<Sprite> = SpaceInvaders.sprites.slice(3..8).toTypedArray(),
-                   damage: Float = 10f,
-                   speed: Float = 1000f
-    )
-    : Bullet(
+class NormalBullet(
+    pos: Vector2,
+    dir: Vector2,
+    parent: Player,
+    onHit: () -> (Unit),
+    spritesToUse: Array<Sprite> = SpaceInvaders.sprites.slice(3..8).toTypedArray(),
+    damage: Float = 10f,
+    speed: Float = 1000f
+) :
+    Bullet(
         pos,
         parent,
         dir,
@@ -22,7 +23,7 @@ class NormalBullet(pos: Vector2,
         spritesToUse,
         speed,
         damage
-     ) {
+    ) {
     lateinit var animation: Animation
 
     override fun start() {
@@ -36,6 +37,5 @@ class NormalBullet(pos: Vector2,
         Animator.destroy(animation)
 
         World.world.instantiate(Explosion(position.cpy(), width))
-
     }
 }

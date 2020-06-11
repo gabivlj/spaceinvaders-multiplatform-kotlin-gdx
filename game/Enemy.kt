@@ -2,7 +2,6 @@ package architecture.game
 
 import architecture.engine.*
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
@@ -10,23 +9,22 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
-import kotlin.math.exp
 
 class Point(val dir: Vector2, val speed: Float, val duration: Float)
 
 open class BasicEnemy(
-        vecPos: Vector2 = Vector2(),
-        sprites: Array<Sprite> = SpaceInvaders.sprites.slice(19..19).toTypedArray(),
-        w: Float,
-        h: Float,
-        var hp: Float
-)
-    : GameObject(
+    vecPos: Vector2 = Vector2(),
+    sprites: Array<Sprite> = SpaceInvaders.sprites.slice(19..19).toTypedArray(),
+    w: Float,
+    h: Float,
+    var hp: Float
+) :
+    GameObject(
         sprites,
         w,
         h,
         vecPos
-) {
+    ) {
     lateinit var player: Player
 
     companion object {
@@ -38,7 +36,7 @@ open class BasicEnemy(
             Game.renderer.particleAtlas.addRegion("cloud_1", Texture("smoke.png"), 0, 0, 400, 300)
         }
 
-        tint = Color(MathUtils.random(), MathUtils.random() , MathUtils.random(), .6f)
+        tint = Color(MathUtils.random(), MathUtils.random(), MathUtils.random(), .6f)
         effect = ParticleEffect()
         effect?.load(Gdx.files.internal("smoketrail.p"), Game.renderer.particleAtlas)
         effect?.start()
@@ -56,7 +54,6 @@ open class BasicEnemy(
 
         if (Math.random() > 0.4f)
             World.world.instantiate(Ammo(centerPos))
-
     }
 
     override fun onDispose() {
@@ -67,18 +64,17 @@ open class BasicEnemy(
 }
 
 class Enemy(
-        vecPos: Vector2,
-        hp: Float = 70.0f,
-        val points: Array<Point> = arrayOf(),
-        sprites: Array<Sprite> = SpaceInvaders.sprites.slice(19..19).toTypedArray()
-)
-    : BasicEnemy(vecPos, sprites, 100f, 200f, 50.0f) {
+    vecPos: Vector2,
+    hp: Float = 70.0f,
+    val points: Array<Point> = arrayOf(),
+    sprites: Array<Sprite> = SpaceInvaders.sprites.slice(19..19).toTypedArray()
+) :
+    BasicEnemy(vecPos, sprites, 100f, 200f, 50.0f) {
 
     var currentPoint = 0
     var duration = 0.0f
     val timeBetweenShooting = 2.0f
     var accumulatorTimeBetweenShooting = 0.0f
-
 
     override fun update(dt: Float) {
         effect?.setPosition(position.x + width / 2, position.y + height / 1.1f)
@@ -89,7 +85,8 @@ class Enemy(
         processWayPoint(dt)
         accumulatorTimeBetweenShooting += dt
         if (timeBetweenShooting <= accumulatorTimeBetweenShooting) {
-            World.world.instantiate(BulletEnemy(
+            World.world.instantiate(
+                BulletEnemy(
                     position,
                     player.position.cpy().sub(position).nor(),
                     {},
@@ -99,7 +96,8 @@ class Enemy(
                     50.0f,
                     20.0f,
                     false
-            ))
+                )
+            )
             accumulatorTimeBetweenShooting = 0.0f
         }
 
@@ -122,7 +120,6 @@ class Enemy(
         }
 
         currentPoint = MathUtils.clamp(currentPoint, 0, points.size - 1)
-
     }
 
     fun destroy() {

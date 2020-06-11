@@ -1,6 +1,5 @@
 package architecture.engine.structs
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 
@@ -13,8 +12,15 @@ enum class ButtonState(val index: Int) {
 /**
  * @param sprites 0 -> IDLE, 1 -> ACTIVE, 2 -> HOVER
  */
-class UIButton(sprites: Array<Sprite>,
-               w: Float, h: Float, position: Vector2, var text: String, var offsetText: Vector2, var onClick: (UIButton) -> Unit) : UIElement(sprites, w, h, position) {
+class UIButton(
+    sprites: Array<Sprite>,
+    w: Float,
+    h: Float,
+    position: Vector2,
+    var text: String,
+    var offsetText: Vector2,
+    var onClick: (UIButton) -> Unit
+) : UIElement(sprites, w, h, position) {
 
     var onHover: (UIButton) -> Unit = { }
     var stopHover: (UIButton) -> Unit = { }
@@ -108,6 +114,4 @@ class UIButton(sprites: Array<Sprite>,
         super.onDispose()
         textUI.stop()
     }
-
-
 }

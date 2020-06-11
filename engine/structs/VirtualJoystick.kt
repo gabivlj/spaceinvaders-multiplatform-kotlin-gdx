@@ -18,27 +18,27 @@ import kotlin.math.abs
  * the game isn't running on mobile devices
  */
 open class VirtualJoystick(
-        // Joystick sprite
-        private val spriteForJoystick: Sprite,
-        // Area sprite
-        private val area: Sprite,
-        // Tag of the joystick
-        tag: String,
-        private val initialPosition: Vector2,
-        // Width of the Area
-        private val widthOutside: Float,
-        // Width of the Joystick
-        private val widthInside: Float,
-        // SensibilityThreshold represents the value that will be useful for checking if the joystick has more or less sensibility
-        private val sensibilityThreshold: Float = 30f,
-        // Range when there is a touch and the joystick isn't dragging. (min, max).
-        private val touchRange: Pair<Int, Int> = Pair(0, 1000),
-        public val maximumValueOnDistCall: Float = 5.0f,
-        // Function that will be fired when dir() is called and the device is not mobile
-        private val dirWhenNotMobile: () -> (Vector2) = { Vector2() },
-        // Function that will be fired when dist() is called and the device is not mobile
-        private val distWhenNotMobile: (j: VirtualJoystick) -> (Float) = { 0.0f }
-    ) : GameObjectInput(), IJoystick {
+    // Joystick sprite
+    private val spriteForJoystick: Sprite,
+    // Area sprite
+    private val area: Sprite,
+    // Tag of the joystick
+    tag: String,
+    private val initialPosition: Vector2,
+    // Width of the Area
+    private val widthOutside: Float,
+    // Width of the Joystick
+    private val widthInside: Float,
+    // SensibilityThreshold represents the value that will be useful for checking if the joystick has more or less sensibility
+    private val sensibilityThreshold: Float = 30f,
+    // Range when there is a touch and the joystick isn't dragging. (min, max).
+    private val touchRange: Pair<Int, Int> = Pair(0, 1000),
+    public val maximumValueOnDistCall: Float = 5.0f,
+    // Function that will be fired when dir() is called and the device is not mobile
+    private val dirWhenNotMobile: () -> (Vector2) = { Vector2() },
+    // Function that will be fired when dist() is called and the device is not mobile
+    private val distWhenNotMobile: (j: VirtualJoystick) -> (Float) = { 0.0f }
+) : GameObjectInput(), IJoystick {
 
     init {
         this.tag = tag
@@ -82,7 +82,7 @@ open class VirtualJoystick(
 
     private lateinit var joystickInside: JoystickInside
     private lateinit var joystickOutside: JoystickOutside
-    private var  centerToOutsideDistance: Float = 0.0f
+    private var centerToOutsideDistance: Float = 0.0f
     // Pivot of the inside joystick that will be set when there is drag or touch
     private var currentPivotInside: Vector2 = Vector2()
     // Pivot of the out joystick that will be set when there is drag or touch and depending on the distance and position of the joystickInside
@@ -90,8 +90,7 @@ open class VirtualJoystick(
     private var currentState: State = State.STATIC
     private var initPos: Vector2 = Vector2(-1f, -1f)
 
-    private var cameraPosOnTouch: Vector2= Vector2()
-
+    private var cameraPosOnTouch: Vector2 = Vector2()
 
     // region LIFECYCLES
     override fun start() {
@@ -103,8 +102,8 @@ open class VirtualJoystick(
         centerToOutsideDistance = joystickInside.width / 2
         currentPivotInside = initialPosition
 
-        World.world.instantiate(joystickInside)
-        World.world.instantiate(joystickOutside)
+        instantiate(joystickInside)
+        instantiate(joystickOutside)
 
         joystickInside.position = Vector2(joystickOutside.position.x + widthOutside / 2, joystickOutside.position.y + widthOutside / 2)
         initPos = unproject(initialPosition)
@@ -125,8 +124,8 @@ open class VirtualJoystick(
                 initPos = unproject(initialPosition)
                 // Center inside position
                 joystickInside.position = Vector2(
-                        (initPos.x + joystickOutside.width / 2) - joystickInside.width / 2,
-                        (initPos.y + joystickOutside.height / 2) - joystickInside.height / 2
+                    (initPos.x + joystickOutside.width / 2) - joystickInside.width / 2,
+                    (initPos.y + joystickOutside.height / 2) - joystickInside.height / 2
                 )
                 joystickOutside.position = Vector2(initPos.x, initPos.y)
             }
@@ -198,7 +197,6 @@ open class VirtualJoystick(
         callSubscribers(dir, dist)
         currentState = State.STATIC
         return super.touchUp(screenX, screenY, pointer, button)
-
     }
 
     fun callSubscribers(dir: Vector2, dist: Float) {
@@ -207,8 +205,6 @@ open class VirtualJoystick(
             element.touchUpJoystick(dir, dist, tag)
         }
     }
-
-
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (pointer != currentPointer) return true
@@ -225,7 +221,7 @@ open class VirtualJoystick(
     // region HELPERS
     private fun unproject(v2: Vector2): Vector2 {
         val unproj = camera.unproject(
-                Vector3(v2.x, v2.y, 0.0f)
+            Vector3(v2.x, v2.y, 0.0f)
         )
         return Vector2(unproj.x, unproj.y)
     }
@@ -271,9 +267,9 @@ open class VirtualJoystick(
     }
 
     fun activate(activateJoy: Boolean) {
-            joystickInside.active = active
-            joystickOutside.active = active
-            active = activateJoy
+        joystickInside.active = active
+        joystickOutside.active = active
+        active = activateJoy
     }
 
     // endregion

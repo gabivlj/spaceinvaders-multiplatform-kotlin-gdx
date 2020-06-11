@@ -8,8 +8,7 @@ enum class AudioType {
     MUSIC, TRACK
 }
 
-class AudioID(val ID: Int, val type: AudioType) {
-}
+class AudioID(val ID: Int, val type: AudioType)
 
 /**
  * Audio class handles disposing, playing, stopping and loading music/track files in one single place
@@ -20,16 +19,16 @@ class AudioID(val ID: Int, val type: AudioType) {
 class Audio {
     companion object {
         var muted: Boolean = false
-        set(value) {
-            if (value) {
-                mutableSounds.forEach { it.pause() }
-                Gdx.app.log("PAUSE", " PAUSAAA ")
-                mutableMusic.forEach { it.pause() }
-            } else {
-                mutableMusic.forEach { it.play() }
+            set(value) {
+                if (value) {
+                    mutableSounds.forEach { it.pause() }
+                    Gdx.app.log("PAUSE", " PAUSAAA ")
+                    mutableMusic.forEach { it.pause() }
+                } else {
+                    mutableMusic.forEach { it.play() }
+                }
+                field = value
             }
-            field = value
-        }
         private val mutableSounds: MutableList<Sound> = mutableListOf()
 
         val sounds: Array<Sound>
@@ -84,7 +83,6 @@ class Audio {
                     music.play()
                     1
                 }
-
             }
         }
 
@@ -115,10 +113,10 @@ class Audio {
          *
          * If class is muted, it does not do anything
          */
-        inline fun <reified T>apply(id: AudioID, fn: (T) -> Unit) {
+        inline fun <reified T> apply(id: AudioID, fn: (T) -> Unit) {
             if (muted) return
             when (T::class) {
-                Sound::class ->  {
+                Sound::class -> {
                     fn(sounds[id.ID] as T)
                 }
                 Music::class -> {

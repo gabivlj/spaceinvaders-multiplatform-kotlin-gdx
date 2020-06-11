@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
-import com.my.architecture.engine.structs.GameObject
 
 fun V2V3(v: Vector2): Vector3 {
     return Vector3(v.x, v.y, 0.0f)
@@ -23,7 +22,6 @@ open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosi
     private var posCamera = Vector3()
     var useScreenCoords = true
     private val subscribers = mutableListOf<GameObjectInput>()
-
 
     /**
      * Stores all the current pointers handled by this UIElement (true if it's inside, false if it's done processing it or outside)
@@ -68,8 +66,7 @@ open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosi
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         var touchPosition = Vector2(screenX.toFloat(), screenY.toFloat())
         touchPosition = V3V2(Game.camera.unproject(V2V3(touchPosition)))
-        sprite().setPosition(position.x, position.y)
-        if (sprite().boundingRectangle.contains(touchPosition)) {
+        if (collider.overlapPoint(touchPosition)) {
             pointers[pointer] = true
             touched(touchPosition, pointer)
         }
@@ -86,7 +83,7 @@ open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosi
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         var touchPosition = Vector2(screenX.toFloat(), screenY.toFloat())
         touchPosition = V3V2(Game.camera.unproject(V2V3(touchPosition)))
-        if (sprite().boundingRectangle.contains(touchPosition)) {
+        if (collider.overlapPoint(touchPosition)) {
             hover()
         } else {
             noHover()
@@ -98,7 +95,7 @@ open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosi
         var touchPosition = Vector2(screenX.toFloat(), screenY.toFloat())
         touchPosition = V3V2(Game.camera.unproject(V2V3(touchPosition)))
         val value = pointers[pointer]
-        Gdx.app.log("TOUCH_UP", "${value}, $touchPosition")
+        Gdx.app.log("TOUCH_UP", "$value, $touchPosition")
         if (value != null && value) {
             touchUp(touchPosition, pointer)
             pointers[pointer] = false
@@ -106,8 +103,6 @@ open class UIElement(sprites: Array<Sprite>, w: Float, h: Float, val initialPosi
 
         return false
     }
-
-
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         val value = pointers[pointer] ?: return false

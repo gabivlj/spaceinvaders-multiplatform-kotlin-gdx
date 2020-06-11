@@ -12,20 +12,20 @@ class Animation(private val gameObject: GameObject, private val start: Int, priv
 
     public var finished = false
 
-
     fun update() {
         if (!running) {
             currentFrame = 0
-            gameObject.spriteIndex = start
+            return
+//            gameObject.spriteIndex = start
         }
 
         if (currentFrame >= framesBetween) {
             gameObject.spriteIndex++
-            currentFrame = 0
+            currentFrame = start
         }
 
         if (gameObject.spriteIndex > end && repeat) {
-            currentFrame = 0
+            currentFrame = start
             gameObject.spriteIndex = currentFrame
             return
         }
@@ -53,7 +53,6 @@ class Animation(private val gameObject: GameObject, private val start: Int, priv
     fun end() {
         running = false
         currentFrame = 0
-        gameObject.spriteIndex = start
     }
 
     /**
@@ -62,7 +61,6 @@ class Animation(private val gameObject: GameObject, private val start: Int, priv
     fun dispose() {
         Animator.destroy(this)
     }
-
 }
 
 class Animator {
@@ -91,5 +89,4 @@ class Animator {
             animations.remove(animation)
         }
     }
-
 }

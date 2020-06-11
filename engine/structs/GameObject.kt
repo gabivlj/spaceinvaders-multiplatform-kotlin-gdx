@@ -7,13 +7,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 
-
-
 open class GameObject(
-        var sprites: Array<Sprite> = arrayOf(),
-        var width: Float = 0f,
-        var height: Float = 0f,
-        var position: Vector2 = Vector2(0f, 0f)
+    var sprites: Array<Sprite> = arrayOf(),
+    var width: Float = 0f,
+    var height: Float = 0f,
+    var position: Vector2 = Vector2(0f, 0f)
 ) {
     var flagDestroyed: Boolean = false
     var flipX: Boolean = false
@@ -27,9 +25,9 @@ open class GameObject(
     var observeDestroy: ((GameObject) -> Unit)? = null
     var tint: Color = Color.WHITE
     val sizeSprites: Int
-    get() {
-        return sprites.size
-    }
+        get() {
+            return sprites.size
+        }
     var disposed: Boolean = false
 
     var depth: Int = 20
@@ -64,7 +62,6 @@ open class GameObject(
     }
 
     open fun update(dt: Float) {
-
     }
 
     open fun start() {}
@@ -75,14 +72,14 @@ open class GameObject(
      * Gets the class that is in the inheritance tree of {this} gameObject. If it doesn't inherit or is the specified class, it will return null.
      * @return This gameObject casted to T
      */
-    inline fun <reified T: GameObject> get(): T? {
+    inline fun <reified T : GameObject> get(): T? {
         if (this is T) {
             return this as T
         }
         return null
     }
 
-    inline fun <reified T: GameObject> check(actionWhenNotNull: (gameObject: T) -> (Unit)): Boolean {
+    inline fun <reified T : GameObject> check(actionWhenNotNull: (gameObject: T) -> (Unit)): Boolean {
         return if (this is T) {
             actionWhenNotNull(this)
             true
@@ -99,10 +96,58 @@ open class GameObject(
     }
 
     open fun onDispose() {
-
     }
-
 
     open fun onDestroy() {}
 
+    companion object {
+
+        // Fast World access/modifiers
+
+        /**
+         * Instantiates a gameObject to world. If this world is the same as the current world, gameObject.start() will be fired.
+         * @param gameObject GameObject to instantiate
+         */
+        public fun <T : GameObject> instantiate(gameObject: T): T {
+            return World.world.instantiate(gameObject)
+        }
+
+        /**
+         * Finds all the instantiated gameObjects in the current World
+         * @return gameObjects
+         */
+        inline fun <reified T : GameObject> findGameObjects(): com.badlogic.gdx.utils.Array<T> {
+            val gameObjectsToReturn = com.badlogic.gdx.utils.Array<T>(World.world.gameObjects.size)
+            for (element in World.world.currentIteration) {
+                if (element is T) {
+                    gameObjectsToReturn.add(element)
+                }
+            }
+            return gameObjectsToReturn
+        }
+
+        /**
+         * Destroys a gameObject from the world.
+         * @param gameObject GameObject you want to destroy
+         */
+        fun destroy(gameObject: GameObject) {
+            if (gameObject.currentPass != World.world.currentPass) gameObject.flagDestroyed = true
+            else {
+                if (!World.world.restarted) {
+                    gameObject.observeDestroy?.invoke(gameObject)
+                    gameObject.onDestroy()
+                }
+                gameObject.onDispose()
+            }
+            World.world.gameObjects.removeValue(gameObject, true)
+        }
+    }
+    /**
+     * Check if the gameObject is overlapping with another.
+     * Will call onCollide on the gameObjects that it collides with
+     * @return if it's overlapping
+     */
+    fun overlaps(): Boolean {
+        return World.world.overlaps(this)
+    }
 }

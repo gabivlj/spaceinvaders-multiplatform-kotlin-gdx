@@ -7,13 +7,12 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.PerformanceCounter
 
-
 open class Game : ApplicationListener {
 
     // region Private variables
     private val renderer: Renderer = Renderer()
     val currentRenderer: Renderer
-    get() = renderer
+        get() = renderer
 
     companion object {
         fun restart() {
@@ -22,9 +21,9 @@ open class Game : ApplicationListener {
 
         lateinit var currentGame: Game
         val camera: Camera
-        get() = currentGame.currentRenderer.camera
+            get() = currentGame.currentRenderer.camera
         val renderer: Renderer
-        get() = currentGame.currentRenderer
+            get() = currentGame.currentRenderer
 
         fun SetPosCamera(v2: Vector2) {
             camera.position.set(0f, 0f, 0f)
@@ -58,7 +57,6 @@ open class Game : ApplicationListener {
         start()
         renderer.start()
         World.world.start()
-
     }
 
     override fun dispose() {
@@ -70,7 +68,6 @@ open class Game : ApplicationListener {
         // We use the current world static variable because if the user wants to change to another world he can do it.
         renderer.renderOptimized(World.world)
         World.world.update()
-
     }
 
     override fun resize(width: Int, height: Int) {
@@ -78,11 +75,9 @@ open class Game : ApplicationListener {
     }
 
     open override fun pause() {
-
     }
 
     open override fun resume() {
-
     }
 
     // endregion

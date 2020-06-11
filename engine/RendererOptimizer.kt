@@ -2,7 +2,6 @@ package architecture.engine
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture
@@ -79,10 +78,10 @@ class TextureOptimizer() {
         if (!tData.isPrepared) tData.prepare()
         var tPixmap = tData.consumePixmap()
         // Add each pixel to our own pixel map
-        for (i in currentX..t.width+currentX) {
+        for (i in currentX..t.width + currentX) {
             // The X of the local texture
             val currentXT = i - currentX
-            for (j in currentY..t.height+currentY) {
+            for (j in currentY..t.height + currentY) {
                 // The Y of the local texture
                 val currentYT = j - currentY
                 // Map local pixel to global pixel
@@ -157,7 +156,7 @@ class RendererOptimizer {
         val json = Json()
         val jsonFile = FileHandle("$name.json")
         pixmap.pixmap.dispose()
-        jsonFile.writeString(json.prettyPrint(pixmap.tInfos),false)
+        jsonFile.writeString(json.prettyPrint(pixmap.tInfos), false)
     }
 
     /**
@@ -180,7 +179,7 @@ class RendererOptimizer {
             regions.add(TextureRegion(bigTexture, textureInfo.x, textureInfo.y, textureInfo.w, textureInfo.h))
             arr.add(Sprite(regions.last()))
         }
-        //spriteStore.addAll(arr)
+        // spriteStore.addAll(arr)
         return arr
     }
 
@@ -210,8 +209,8 @@ class RendererOptimizer {
         try {
             val json = Json()
             val list: Array<TextureInfo> = json.fromJson(
-                    Array<TextureInfo>::class.java,
-                    Gdx.files.internal("$name.json")
+                Array<TextureInfo>::class.java,
+                Gdx.files.internal("$name.json")
             )
             if (list.isEmpty()) {
                 return mutableListOf()
@@ -222,10 +221,8 @@ class RendererOptimizer {
             spriteStore.addAll(sprites)
             return sprites
         } catch (e: Throwable) {
-            Gdx.app.log("RendererOptimizer $this","Error consuming from JSON. Handle the empty list if this is the first time consuming! ${e.message}")
+            Gdx.app.log("RendererOptimizer $this", "Error consuming from JSON. Handle the empty list if this is the first time consuming! ${e.message}")
             return mutableListOf()
         }
     }
-
-
 }

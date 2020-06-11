@@ -6,15 +6,17 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
 
-class BulletEnemy(pos: Vector2,
-                  val dir: Vector2,
-                  onHit: () -> (Unit),
-                  sprites: Array<Sprite>,
-                  speed: Float,
-                  damage: Float,
-                  w: Float = 50f,
-                  h: Float = 75f,
-                  val follow: Boolean) : Bullet(pos, null, dir, onHit, sprites, speed, damage, w, h) {
+class BulletEnemy(
+    pos: Vector2,
+    val dir: Vector2,
+    onHit: () -> (Unit),
+    sprites: Array<Sprite>,
+    speed: Float,
+    damage: Float,
+    w: Float = 50f,
+    h: Float = 75f,
+    val follow: Boolean
+) : Bullet(pos, null, dir, onHit, sprites, speed, damage, w, h) {
     override fun start() {
         super.start()
         rotation = (MathUtils.atan2(dir.y, dir.x) * 180 / Math.PI.toFloat()) - 180
@@ -44,5 +46,4 @@ class BulletEnemy(pos: Vector2,
             World.world.destroy(other)
         }
     }
-
 }

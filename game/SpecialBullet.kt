@@ -2,8 +2,8 @@ package architecture.game
 
 import com.badlogic.gdx.math.Vector2
 
-class SpecialBullet(pos: Vector2, parent: Player, dir: Vector2, onHit: () -> (Unit))
-    : Bullet(
+class SpecialBullet(pos: Vector2, parent: Player, dir: Vector2, onHit: () -> (Unit)) :
+    Bullet(
         pos,
         parent,
         dir,
@@ -13,7 +13,7 @@ class SpecialBullet(pos: Vector2, parent: Player, dir: Vector2, onHit: () -> (Un
         50f,
         130f,
         130f
-) {
+    ) {
     override fun update(dt: Float) {
         super.update(dt)
         rotation += dt * 10f

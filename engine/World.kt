@@ -5,28 +5,24 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.input.GestureDetector
-import com.my.architecture.engine.structs.GameObject
-import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.PerformanceCounter
+import com.my.architecture.engine.structs.GameObject
 
-/**
- * TODO:
- *  - have final boss -> do
- *  - add 2 players ----> oof
- *  - UI Manager for buttons
- */
 class World {
     // region Private
     private var currentID: Int = 0
     private var _gameObjects: Array<GameObject> = Array(1000)
     private var _colliders: Array<BoxCollider> = Array(1000)
 
+    var colliders: Array<BoxCollider> = Array()
+        get() = _colliders
+
     // endregion
 
     // region Public
     val gameObjects: com.badlogic.gdx.utils.Array<GameObject>
-    get() = _gameObjects
+        get() = _gameObjects
     // endregion
 
     private var _inputGesture: Input = Input()
@@ -53,7 +49,7 @@ class World {
 
         private var currentInput = Input()
         val input: Input
-        get() = currentInput
+            get() = currentInput
 
         /**
          * Previous world
@@ -113,7 +109,9 @@ class World {
             world.dispose()
         }
         world = this
-        onStart()
+        if (firstStart) {
+            onStart()
+        }
         firstStart = false
     }
 
@@ -140,7 +138,8 @@ class World {
      * Instantiates a gameObject to world. If this world is the same as the current world, gameObject.start() will be fired.
      * @param gameObject GameObject to instantiate
      */
-    fun <T: GameObject> instantiate(gameObject: T): T{
+    fun <T: GameObject> instantiate(gameObject: T): T {
+        if (restarted) return gameObject
         gameObject.instanceID = currentID++
         gameObjects.add(gameObject)
         changedDepth()
@@ -187,7 +186,14 @@ class World {
             gameObject.update(dt)
         }
         currentPass++
-        restarted = false
+        if (restarted) {
+            restarted = false
+            if (!firstStart) {
+                onStart()
+                firstStart = false
+            }
+        }
+
     }
 
     /**

@@ -4,7 +4,6 @@ import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.math.Vector2
 import kotlin.math.abs
 
-
 enum class ToListen {
     LEFT_FACE,
     RIGHT_FACE,
@@ -27,7 +26,6 @@ enum class ToListen {
     LEFT_STICK,
     LEFT_TRIGGER,
     RIGHT_TRIGGER,
-
 
     // For arcade type gamepads (tries from left to right and from top to bottom) (IF THERE ARE MORE BUTTONS LIKE A SECOND PLAYER THE SECOND PLAYER WILL BE
     // USE THE BUTTON_X_1 NOT BUTTON_X_0
@@ -55,7 +53,7 @@ enum class ToListen {
     BUTTON_6_1,
     // Xinmotek: Top right button
     BUTTON_7_1
-}
+};
 
 enum class XinmotekButtonMappings {
     ;
@@ -73,7 +71,6 @@ enum class XinmotekButtonMappings {
             val values = ToListen.values()
             return if (buttonCode < values.size) values[buttonCode] else ToListen.NONE
         }
-
     }
 }
 
@@ -190,9 +187,9 @@ enum class PS4AxisMappings(val value: Int, val representation: ToListen) {
  * @param keyCodeFallback When the keyboard is used, this will be used to listen to key inputs. (x, -x, y, -y) MUST BE SIZE 4 or it will throw an assertion exception
  */
 class PhysicalJoystick(
-        private val whatToListen: ToListen,
-        private val keyCodeFallback: Array<Int> = arrayOf(-1, -1, -1, -1),
-        private val maxValueOnDist: Float = 3.0f
+    private val whatToListen: ToListen,
+    private val keyCodeFallback: Array<Int> = arrayOf(-1, -1, -1, -1),
+    private val maxValueOnDist: Float = 3.0f
 ) : GameObjectInput(arrayOf(), 0.0f, 0.0f, Vector2(0.0f, 0.0f)), IJoystick {
     val subscribers: MutableList<GameObjectInput> = mutableListOf()
 
@@ -200,12 +197,10 @@ class PhysicalJoystick(
     var totalValue: Vector2 = Vector2()
     var usingKeys: Boolean = false
 
-
     val usingJoystick: Boolean
         get() {
             return !usingKeys
         }
-
 
     init {
         assert(keyCodeFallback.size == 4)
@@ -219,14 +214,14 @@ class PhysicalJoystick(
             return false
         }
 
-        val xinmotekMap=  if (
-                whatToListen == ToListen.LEFT_FACE ||
-                whatToListen == ToListen.RIGHT_FACE ||
-                whatToListen == ToListen.TOP_FACE ||
-                whatToListen == ToListen.BOTTOM_FACE
-                )
-                       XinmotekButtonMappings.toNormalGamepad(buttonCode, controllerString)
-                 else  XinmotekButtonMappings.from(buttonCode, controllerString)
+        val xinmotekMap = if (
+            whatToListen == ToListen.LEFT_FACE ||
+            whatToListen == ToListen.RIGHT_FACE ||
+            whatToListen == ToListen.TOP_FACE ||
+            whatToListen == ToListen.BOTTOM_FACE
+        )
+            XinmotekButtonMappings.toNormalGamepad(buttonCode, controllerString)
+        else XinmotekButtonMappings.from(buttonCode, controllerString)
         if (xinmotekMap == whatToListen) {
             subscribers.forEach { it.buttonDownParsed(this, whatToListen) }
             return false

@@ -31,5 +31,4 @@ class Text {
     fun render() {
         Game.renderer.textUI.add(this)
     }
-
 }

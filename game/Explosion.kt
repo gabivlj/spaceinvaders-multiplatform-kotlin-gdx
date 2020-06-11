@@ -8,10 +8,10 @@ import com.badlogic.gdx.math.Vector2
 import com.my.architecture.engine.structs.GameObject
 
 class Explosion(pos: Vector2, size: Float = 100f, spritesExplosion: Array<Sprite> = SpaceInvaders.sprites.slice(9..17).toTypedArray()) : GameObject(
-        spritesExplosion,
-        size,
-        size,
-        pos
+    spritesExplosion,
+    size,
+    size,
+    pos
 ) {
     lateinit var animation: Animation
 
@@ -27,5 +27,4 @@ class Explosion(pos: Vector2, size: Float = 100f, spritesExplosion: Array<Sprite
             animation.dispose()
         }
     }
-
 }

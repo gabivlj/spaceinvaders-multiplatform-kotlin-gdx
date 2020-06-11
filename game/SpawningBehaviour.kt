@@ -7,12 +7,11 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonWriter.OutputType
 import com.my.architecture.engine.structs.GameObject
 
-
 class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(
-        arrayOf(),
-        0.0f,
-        0.0f,
-        Vector2(0.0f, 0.0f)
+    arrayOf(),
+    0.0f,
+    0.0f,
+    Vector2(0.0f, 0.0f)
 ) {
     private var currentSpawner = -1
     private var enemiesLeft = 0
@@ -25,8 +24,8 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(
 
     var posX = 0.0f
         get() {
-            val maxX = player.position.x + 100
-            val minX = player.position.y - 100
+            val maxX = player.position.x + Gdx.graphics.width / 2
+            val minX = player.position.x - Gdx.graphics.width / 2
             val posX = Math.random().toFloat() * (maxX - minX) + minX
             return posX
         }
@@ -38,32 +37,36 @@ class SpawningBehaviour(val map: Map = Config.currentMap.cpy()) : GameObject(
         for (spawner in map.spawners) {
             spawner.nEnemiesFollow *= Config.difficulty.multiplierNOfEnemies
             spawner.nEnemiesNormal *= Config.difficulty.multiplierNOfEnemies
-            spawner.nBosses        *= Config.difficulty.multiplierNOfEnemies
+            spawner.nBosses *= Config.difficulty.multiplierNOfEnemies
         }
-        randomFn = arrayOf({
-            if (currentSpawnerItem.nBosses <= 0) {
-                return@arrayOf null
+        randomFn = arrayOf(
+            {
+                if (currentSpawnerItem.nBosses <= 0) {
+                    return@arrayOf null
+                }
+                currentSpawnerItem.nBosses--
+                val enemy = EnemyFollow(Vector2(posX, 0.0f))
+                enemy.observeDestroy = { enemiesLeft-- }
+                enemy.position.y = enemy.height + LevelManager.level.topBounds
+                enemy
+            },
+            {
+                if (currentSpawnerItem.nEnemiesFollow <= 0) return@arrayOf null
+                currentSpawnerItem.nEnemiesFollow--
+                val enemy = EnemyFollow(Vector2(posX, 0.0f))
+                enemy.observeDestroy = { enemiesLeft-- }
+                enemy.position.y = enemy.height + LevelManager.level.topBounds
+                enemy
+            },
+            {
+                if (currentSpawnerItem.nEnemiesNormal <= 0) return@arrayOf null
+                currentSpawnerItem.nEnemiesNormal--
+                val enemy = Enemy(Vector2(posX, 0.0f), 100.0f, Config.randomSetOfPoint())
+                enemy.observeDestroy = { enemiesLeft-- }
+                enemy.position.y = enemy.height + LevelManager.level.topBounds
+                enemy
             }
-            currentSpawnerItem.nBosses--
-            val enemy = EnemyFollow(Vector2(posX, 0.0f))
-            enemy.observeDestroy = { enemiesLeft-- }
-            enemy.position.y = enemy.height + LevelManager.level.topBounds
-            enemy
-        }, {
-            if (currentSpawnerItem.nEnemiesFollow <= 0) return@arrayOf null
-            currentSpawnerItem.nEnemiesFollow--
-            val enemy = EnemyFollow(Vector2(posX, 0.0f))
-            enemy.observeDestroy = { enemiesLeft-- }
-            enemy.position.y = enemy.height + LevelManager.level.topBounds
-            enemy
-        }, {
-            if (currentSpawnerItem.nEnemiesNormal <= 0) return@arrayOf null
-            currentSpawnerItem.nEnemiesNormal--
-            val enemy = Enemy(Vector2(posX, 0.0f), 100.0f, Config.randomSetOfPoint())
-            enemy.observeDestroy = { enemiesLeft-- }
-            enemy.position.y = enemy.height + LevelManager.level.topBounds
-            enemy
-        })
+        )
     }
 
     private fun finishedAllSpawns(): Boolean {
@@ -164,13 +167,13 @@ class LoaderSpawner {
                 json.ignoreUnknownFields = true
                 json.setOutputType(OutputType.json)
                 val maps: Maps = json.fromJson(
-                        Maps::class.java,
-                        Gdx.files.internal("m.json")
+                    Maps::class.java,
+                    Gdx.files.internal("m.json")
                 )
                 maps
             } catch (e: Throwable) {
                 Gdx.app.log("$e", "$e")
-                Gdx.app.log("LoaderSpawner $this","Error consuming from JSON from map. ${e.message}")
+                Gdx.app.log("LoaderSpawner $this", "Error consuming from JSON from map. ${e.message}")
                 throw Exception(e)
                 null
             }
@@ -178,7 +181,7 @@ class LoaderSpawner {
     }
 }
 
-class Maps  {
+class Maps {
     var maps: Array<Map> = arrayOf()
 
     constructor (mapz: Array<Map>) {
@@ -199,13 +202,15 @@ class Map {
         map.image = this.image
         map.background = this.background
         map.name = this.name
-        map.spawners = spawners.map { SpawnerMap(
+        map.spawners = spawners.map {
+            SpawnerMap(
                 it.nEnemiesFollow,
                 it.nEnemiesNormal,
                 it.nBosses,
                 it.velocityCamera,
                 it.timeBetweenSpawns
-        ) }.toTypedArray()
+            )
+        }.toTypedArray()
         return map
     }
 

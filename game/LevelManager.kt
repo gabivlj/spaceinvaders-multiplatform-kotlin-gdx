@@ -1,26 +1,27 @@
 package architecture.game
 
-
 import architecture.engine.Game
-import architecture.engine.Renderer
 import architecture.engine.World
 import architecture.engine.structs.PhysicalJoystick
 import architecture.engine.structs.ToListen
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.my.architecture.engine.structs.GameObject
 
-class Spawn (
-        val positionToSpawn: Float,
-        val enemies: Array<BasicEnemy>,
-        val timeBetweenSpawns: Float,
-        val offsetPlayerX: Float
-): GameObject(arrayOf(), 0.0f, 0.0f) {
+/**
+ * @deprecated
+ * @see SpawningBehaviour
+ */
+class Spawn(
+    val positionToSpawn: Float,
+    val enemies: Array<BasicEnemy>,
+    val timeBetweenSpawns: Float,
+    val offsetPlayerX: Float
+) : GameObject(arrayOf(), 0.0f, 0.0f) {
     var time = timeBetweenSpawns
     var currentEnemy = 0
 
@@ -57,15 +58,13 @@ class Spawn (
         if (currentEnemy >= enemies.size) {
             World.world.destroy(this)
         }
-
     }
 }
-
 
 /**
  * @NOTE THIS class should be the last thing to be initialized.
  */
-class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
+class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f) {
     var topBounds: Float = 0.0f
     var bottomBounds: Float = 0.0f
     var rightBounds: Float = 0.0f
@@ -85,8 +84,8 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
         lateinit var level: LevelManager
 
         fun outOfBounds(position: Vector2, height: Float, width: Float): Boolean {
-            return position.y + height < LevelManager.level.bottomBounds || position.y > LevelManager.level.topBounds
-                    || position.x > LevelManager.level.rightBounds || position.x + width < LevelManager.level.leftBounds
+            return position.y + height < LevelManager.level.bottomBounds || position.y > LevelManager.level.topBounds ||
+                position.x > LevelManager.level.rightBounds || position.x + width < LevelManager.level.leftBounds
         }
 
         fun addPlayer() {
@@ -96,27 +95,35 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
             pos.y = Game.camera.position.y
             pos.z = Game.camera.position.z
 
-            val joystick01 = World.world.instantiate(PhysicalJoystick(
+            val joystick01 = World.world.instantiate(
+                PhysicalJoystick(
                     ToListen.NONE,
                     arrayOf(Input.Keys.H, Input.Keys.F, Input.Keys.T, Input.Keys.G),
                     2.5f
-            ))
-            val joystick02 = World.world.instantiate(PhysicalJoystick(
+                )
+            )
+            val joystick02 = World.world.instantiate(
+                PhysicalJoystick(
                     ToListen.NONE,
                     arrayOf(Input.Keys.L, Input.Keys.J, Input.Keys.I, Input.Keys.K),
                     2.5f
-            ))
-            val joystick03 = World.world.instantiate(PhysicalJoystick(
+                )
+            )
+            val joystick03 = World.world.instantiate(
+                PhysicalJoystick(
                     ToListen.NONE,
                     arrayOf(Input.Keys.Y, -1, Input.Keys.Y, -1),
                     2.5f
-            ))
-            val player = World.world.instantiate(Player(
+                )
+            )
+            val player = World.world.instantiate(
+                Player(
                     SpaceInvaders.sprites.slice(0..2).toTypedArray(),
                     joystick01,
                     joystick02,
                     joystick03
-            ))
+                )
+            )
             player.position.x = camera.position.x
             player.position.y = camera.position.y
             player.tint = Color.PURPLE
@@ -143,7 +150,7 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
 
 //    private fun spawner() {
 //        if (currentSpawner >= enemiesToSpawn.size) return
-////        Gdx.app.log("SPAWNER", "${camera.position.y + camera.viewportHeight / 2}")
+// //        Gdx.app.log("SPAWNER", "${camera.position.y + camera.viewportHeight / 2}")
 //        if (camera.position.y + camera.viewportHeight / 2 >= enemiesToSpawn[currentSpawner].positionToSpawn) {
 //            World.world.instantiate(enemiesToSpawn[currentSpawner])
 //            currentSpawner++
@@ -166,7 +173,4 @@ class LevelManager : GameObject(arrayOf(), 0.0f, 0.0f){
             camera.update()
         }
     }
-
-
-
 }

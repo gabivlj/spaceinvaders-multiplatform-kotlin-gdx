@@ -1,7 +1,6 @@
 package architecture.engine
 
 import architecture.engine.structs.GameObjectInput
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerListener
@@ -10,13 +9,10 @@ import com.badlogic.gdx.input.GestureDetector
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 
-
-
 /**
  * All the listeners
  */
 class Input : InputProcessor, GestureDetector.GestureListener, ControllerListener {
-
 
     companion object {
         /**
@@ -24,7 +20,7 @@ class Input : InputProcessor, GestureDetector.GestureListener, ControllerListene
          */
 
         val input: Input
-        get() = World.input
+            get() = World.input
     }
 
     var subscribers: MutableList<GameObjectInput> = mutableListOf()
@@ -99,7 +95,7 @@ class Input : InputProcessor, GestureDetector.GestureListener, ControllerListene
     }
 
     override fun pinchStop() {
-        input.subscribers.forEach { g -> g.pinchStop() } //To change body of created functions use File | Settings | File Templates.
+        input.subscribers.forEach { g -> g.pinchStop() } // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {

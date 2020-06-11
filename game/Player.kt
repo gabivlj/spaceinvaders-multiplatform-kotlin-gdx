@@ -19,13 +19,13 @@ import kotlin.math.abs
 class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, private val attackJoystick: IJoystick, private val specialAttackJoy: IJoystick) : GameObjectInput(sprites, 60f, 60f, Vector2(50f, 50f)) {
 
     enum class CurrentShot(
-            val nBullets: Int,
-            val damage: Float,
-            val spritesBullet: IntRange,
-            val margin: Float,
-            val speed: Float = 1000f,
-            val size: Vector2 = Vector2(50f, 100f),
-            val ammo: Float = 1000f
+        val nBullets: Int,
+        val damage: Float,
+        val spritesBullet: IntRange,
+        val margin: Float,
+        val speed: Float = 1000f,
+        val size: Vector2 = Vector2(50f, 100f),
+        val ammo: Float = 1000f
     ) {
         NORMAL(1, 10f, 3..8, 0f),
         ENERGY(3, 8f, 30..30, 53f, 1000f, Vector2(20f, 100f)),
@@ -43,8 +43,6 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     private var cooldownAccReceivingDamage: Float = -4.0f
     private val cooldownReceivingDamage: Float = 1.0f
     private lateinit var audioShoot: AudioID
-
-
 
     override fun keyDown(keycode: Int): Boolean {
         return true
@@ -85,13 +83,13 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             return
         }
         cooldownAccReceivingDamage += dt
-        World.world.overlaps(this)
+        overlaps()
         val direction = movementJoystick.dir()
         val distance = movementJoystick.dist()
         val canMove = position.x >= LevelManager.level.leftBounds &&
-                                position.x + width <= LevelManager.level.rightBounds &&
-                                position.y + height <= LevelManager.level.topBounds &&
-                                position.y > LevelManager.level.bottomBounds
+            position.x + width <= LevelManager.level.rightBounds &&
+            position.y + height <= LevelManager.level.topBounds &&
+            position.y > LevelManager.level.bottomBounds
         if (canMove) {
             position.x += direction.x * 200 * dt * distance
             position.y += direction.y * 200 * dt * distance
@@ -104,7 +102,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
         spriteIndex = when {
             abs(direction.x) > 0.8f -> 2
             abs(direction.x) > 0.5f -> 1
-            else                    -> 0
+            else -> 0
         }
         cooldownAttack += dt
         val dist = attackJoystick.dist()
@@ -125,13 +123,13 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
         }
         for (i in 1..currentShot.nBullets) {
             val bullet = NormalBullet(
-                    Vector2(),
-                    dir,
-                    this,
-                    { accumulatorSpecialAttack += 10f },
-                    SpaceInvaders.sprites.slice(currentShot.spritesBullet).toTypedArray(),
-                    currentShot.damage,
-                    currentShot.speed
+                Vector2(),
+                dir,
+                this,
+                { accumulatorSpecialAttack += 10f },
+                SpaceInvaders.sprites.slice(currentShot.spritesBullet).toTypedArray(),
+                currentShot.damage,
+                currentShot.speed
             )
             bullet.width = currentShot.size.x
             bullet.height = currentShot.size.y
@@ -159,18 +157,20 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     }
 
     override fun buttonDownParsed(controller: PhysicalJoystick, whatToListen: ToListen) {
-        if (accumulatorSpecialAttack < 100 ) {
+        if (accumulatorSpecialAttack < 100) {
             return
         }
         if (whatToListen != ToListen.LEFT_FACE) {
             return
         }
         accumulatorSpecialAttack = 0.0f
-        World.world.instantiate(SpecialBullet(
+        World.world.instantiate(
+            SpecialBullet(
                 position.cpy(),
                 this,
                 movementJoystick.dir()
-        ){ accumulatorSpecialAttack += 10f })
+            ) { accumulatorSpecialAttack += 10f }
+        )
     }
 
     /**
@@ -178,15 +178,17 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
      * because of: specialAttackJoy.subscribe(this)
      */
     override fun touchUpJoystick(direction: Vector2, dist: Float, joystickTag: String) {
-        if (dist <= 0 || direction.len() <= .5f || accumulatorSpecialAttack < 100 ) {
+        if (dist <= 0 || direction.len() <= .5f || accumulatorSpecialAttack < 100) {
             return
         }
         accumulatorSpecialAttack = 0.0f
-        World.world.instantiate(SpecialBullet(
+        World.world.instantiate(
+            SpecialBullet(
                 position.cpy(),
                 this,
                 direction
-        ){ accumulatorSpecialAttack += 10f })
+            ) { accumulatorSpecialAttack += 10f }
+        )
     }
 
     override fun onDispose() {
