@@ -8,11 +8,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 
 open class GameObject(
-    var sprites: Array<Sprite> = arrayOf(),
-    var width: Float = 0f,
-    var height: Float = 0f,
-    var position: Vector2 = Vector2(0f, 0f)
+        var sprites: Array<Sprite> = arrayOf(),
+        var width: Float = 0f,
+        var height: Float = 0f,
+        var position: Vector2 = Vector2(0f, 0f)
 ) {
+    var dontDestroy: Boolean = false
     var flagDestroyed: Boolean = false
     var flipX: Boolean = false
     var flipY: Boolean = false
@@ -39,6 +40,7 @@ open class GameObject(
 
     private var colliderMutable: BoxCollider = BoxCollider(width, height, this)
 
+
     val collider: BoxCollider
         get() = colliderMutable
 
@@ -47,14 +49,24 @@ open class GameObject(
      * @param width
      * @param height
      */
-    fun activateCollisions(width: Float = colliderMutable.width, height: Float = colliderMutable.height, useGameObjectDimensions: Boolean = false) {
+    fun activateCollisions(
+            width: Float = colliderMutable.width,
+            height: Float = colliderMutable.height,
+            position: Vector2? = null,
+            useGameObjectDimensions: Boolean = false
+    ) {
         if (useGameObjectDimensions) {
             colliderMutable.useSprite = true
+            colliderMutable.active = true
             return
+        }
+        if (position != null) {
+            colliderMutable.position = position
         }
         colliderMutable.width = width
         colliderMutable.height = height
         colliderMutable.active = true
+        colliderMutable.useSprite = false
     }
 
     fun deactivateCollisions() {
@@ -62,6 +74,7 @@ open class GameObject(
     }
 
     open fun update(dt: Float) {
+
     }
 
     open fun start() {}
@@ -72,14 +85,14 @@ open class GameObject(
      * Gets the class that is in the inheritance tree of {this} gameObject. If it doesn't inherit or is the specified class, it will return null.
      * @return This gameObject casted to T
      */
-    inline fun <reified T : GameObject> get(): T? {
+    inline fun <reified T: GameObject> get(): T? {
         if (this is T) {
             return this as T
         }
         return null
     }
 
-    inline fun <reified T : GameObject> check(actionWhenNotNull: (gameObject: T) -> (Unit)): Boolean {
+    inline fun <reified T: GameObject> check(actionWhenNotNull: (gameObject: T) -> (Unit)): Boolean {
         return if (this is T) {
             actionWhenNotNull(this)
             true
@@ -96,9 +109,13 @@ open class GameObject(
     }
 
     open fun onDispose() {
+
     }
 
+
+
     open fun onDestroy() {}
+
 
     companion object {
 
@@ -108,7 +125,7 @@ open class GameObject(
          * Instantiates a gameObject to world. If this world is the same as the current world, gameObject.start() will be fired.
          * @param gameObject GameObject to instantiate
          */
-        public fun <T : GameObject> instantiate(gameObject: T): T {
+        fun <T : GameObject> instantiate(gameObject: T): T {
             return World.world.instantiate(gameObject)
         }
 
@@ -131,15 +148,7 @@ open class GameObject(
          * @param gameObject GameObject you want to destroy
          */
         fun destroy(gameObject: GameObject) {
-            if (gameObject.currentPass != World.world.currentPass) gameObject.flagDestroyed = true
-            else {
-                if (!World.world.restarted) {
-                    gameObject.observeDestroy?.invoke(gameObject)
-                    gameObject.onDestroy()
-                }
-                gameObject.onDispose()
-            }
-            World.world.gameObjects.removeValue(gameObject, true)
+            return World.world.destroy(gameObject)
         }
     }
     /**
@@ -150,4 +159,20 @@ open class GameObject(
     fun overlaps(): Boolean {
         return World.world.overlaps(this)
     }
+
+    /**
+     * Util method that centers the gameObject.
+     */
+    fun center(): Vector2 {
+        position.x -= width / 2f
+        position.y -= height / 2f
+        return position
+    }
+
+    fun centerRight(): Vector2 {
+        position.x += width / 2f
+        position.y += height / 2f
+        return position
+    }
+
 }

@@ -133,7 +133,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             )
             bullet.width = currentShot.size.x
             bullet.height = currentShot.size.y
-            val bull = World.world.instantiate(bullet)
+            val bull = instantiate(bullet)
             // -90 deg because the sprite is already looking up
             bull.rotation = (MathUtils.atan2(dir.y, dir.x) * 180 / Math.PI.toFloat()) - 90
             val pos = position.cpy()
@@ -164,7 +164,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             return
         }
         accumulatorSpecialAttack = 0.0f
-        World.world.instantiate(
+        instantiate(
             SpecialBullet(
                 position.cpy(),
                 this,
@@ -182,7 +182,7 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
             return
         }
         accumulatorSpecialAttack = 0.0f
-        World.world.instantiate(
+        instantiate(
             SpecialBullet(
                 position.cpy(),
                 this,
@@ -194,11 +194,6 @@ class Player(sprites: Array<Sprite>, private val movementJoystick: IJoystick, pr
     override fun onDispose() {
         specialAttackJoy.unsubscribe(this)
         Game.renderer.effects.remove(effect)
-    }
-
-    override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-        Gdx.app.log("tap", "tapped")
-        return super.tap(x, y, count, button)
     }
 
     override fun onCollide(other: GameObject) {

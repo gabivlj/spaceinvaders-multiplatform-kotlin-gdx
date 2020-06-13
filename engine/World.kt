@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.PerformanceCounter
 import com.my.architecture.engine.structs.GameObject
 
 class World {
+
     // region Private
     private var currentID: Int = 0
     private var _gameObjects: Array<GameObject> = Array(1000)
@@ -79,10 +80,14 @@ class World {
     private fun dispose() {
         restarted = true
         gameObjects.forEach {
+            if (it.dontDestroy) {
+                return@forEach
+            }
+            it.initialized = false
             it.onDispose()
             it.disposed = true
         }
-        _gameObjects = Array(1000)
+        _gameObjects = Array(_gameObjects.filter { it.dontDestroy }.toTypedArray())
         Game.renderer.reset()
         onFinish()
         Audio.dispose()
@@ -108,11 +113,14 @@ class World {
         if (!firstStart) {
             world.dispose()
         }
+        this._gameObjects = world._gameObjects
         world = this
         if (firstStart) {
+            firstStart = false
+            restarted = false
             onStart()
+
         }
-        firstStart = false
     }
 
     /**
@@ -120,9 +128,11 @@ class World {
      * @param gameObject GameObject you want to destroy
      */
     fun destroy(gameObject: GameObject) {
-        if (gameObject.currentPass != currentPass) gameObject.flagDestroyed = true
+        if (gameObject.dontDestroy) return
+        if (gameObject.currentPass != currentPass && looping) gameObject.flagDestroyed = true
         else {
             if (!restarted) {
+
                 gameObject.observeDestroy?.invoke(gameObject)
                 gameObject.onDestroy()
             }
@@ -140,6 +150,7 @@ class World {
      */
     fun <T: GameObject> instantiate(gameObject: T): T {
         if (restarted) return gameObject
+        gameObject.disposed = false
         gameObject.instanceID = currentID++
         gameObjects.add(gameObject)
         changedDepth()
@@ -151,6 +162,7 @@ class World {
     val performanceCounter: PerformanceCounter = PerformanceCounter("heh")
 
     var currentPass: Int = 0
+    var looping = false
     /**
      * Executes .update() on every instantiated gameObject in the world
      */
@@ -167,30 +179,33 @@ class World {
             }
         }
 
+        looping = true
         for (gameObject in currentIteration) {
+
             if (gameObject.disposed) continue
-            if (restarted) { gameObject.onDispose(); continue }
+            if (restarted) {
+                gameObject.onDispose();
+                continue
+            }
             else if (gameObject.flagDestroyed) {
                 gameObject.onDestroy()
                 gameObject.observeDestroy?.invoke(gameObject)
                 gameObject.onDispose()
                 continue
             }
-
             gameObject.currentPass = currentPass
-
             if (!gameObject.initialized) {
                 gameObject.start()
                 gameObject.initialized = true
             }
             gameObject.update(dt)
         }
+        looping = false
         currentPass++
         if (restarted) {
             restarted = false
             if (!firstStart) {
                 onStart()
-                firstStart = false
             }
         }
 

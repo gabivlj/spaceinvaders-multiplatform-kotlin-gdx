@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector3
  */
 class Input : InputProcessor, GestureDetector.GestureListener, ControllerListener {
 
+
     companion object {
         /**
          * This is static because we share it across the inputs of the engine, like the InputProcessor or the GestureListener one.
@@ -35,7 +36,8 @@ class Input : InputProcessor, GestureDetector.GestureListener, ControllerListene
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        input.subscribers.forEach { g -> g.touchUp(screenX, screenY, pointer, button) }
+        val subscribersSafe = subscribers.toMutableList()
+        subscribersSafe.forEach { g -> g.touchUp(screenX, screenY, pointer, button) }
         return false
     }
 
@@ -48,7 +50,6 @@ class Input : InputProcessor, GestureDetector.GestureListener, ControllerListene
         // todo: Put this on every event
         val subscribersSafe = subscribers.toMutableList()
         subscribersSafe.forEach { g -> g.keyTyped(character) }
-        input.subscribers = subscribersSafe.toMutableList()
         return false
     }
 
@@ -95,7 +96,7 @@ class Input : InputProcessor, GestureDetector.GestureListener, ControllerListene
     }
 
     override fun pinchStop() {
-        input.subscribers.forEach { g -> g.pinchStop() } // To change body of created functions use File | Settings | File Templates.
+        input.subscribers.forEach { g -> g.pinchStop() } //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
